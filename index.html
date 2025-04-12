@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Electronics Detector</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Previous styles remain the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 30px;
+        }
+
+        .stage-container {
+            display: flex;
+            margin-bottom: 30px;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .stage {
+            flex: 1;
+            max-width: 200px;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .stage-number {
+            width: 30px;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .stage.active .stage-number {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .stage:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -5px;
+            width: 100%;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .camera-container {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        #video, #capturedImage {
+            width: 100%;
+            height: 480px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .camera-container:hover .camera-overlay {
+            opacity: 1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+
+        .verification-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .verify-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .verify-btn.accept {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .verify-btn.reject {
+            background: #f44336;
+            color: white;
+        }
+
+        .verify-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .result-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .result-item:hover {
+            transform: translateX(5px);
+            background: #f0f0f0;
+        }
+
+        .confidence-bar {
+            width: 200px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-level {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.6s ease-out;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 40px;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .loading i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        #continueBtn {
+            display: none;
+            opacity: 0;
+        }
+
+        #continueBtn.slideIn {
+            opacity: 1;
+            animation: slideIn 0.5s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+            opacity: 1;
+            }
+        }
+
+        .detailed-info-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .device-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #qrCodeContainer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #qrCode {
+            display: flex;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        #qrCode img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .form-group input[readonly] {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .personal-info {
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-header h2 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .login-status {
+            background: #f0f0f0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-row .info-label {
+            flex: 1;
+            color: #666;
+        }
+
+        .info-row .info-value {
+            flex: 2;
+            color: #2c3e50;
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: #2d5a27;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            transition: 0.3s;
+            z-index: 1000;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Update main content to accommodate sidebar */
+        .container {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .nav-item span {
+                display: none;
+            }
+
+            .container {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+        }
+
+        /* Ensure body has proper styling */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #f5f7fa;
+        }
+        .sidenav {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            z-index: 1001;
+            top: 0;
+            left: 0;
+            background: rgba(45, 90, 39, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding-top: 20px;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            transition: 0.3s ease;
+        }
+
+        .sidenav-header {
+            padding: 0 20px 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidenav-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .sidenav-header h2 {
+            color: white;
+            font-size: 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: #4CAF50;
+        }
+
+        .nav-item i {
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+        .user-profile {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .user-role {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Smart Electronics Detector</h1>
+            <p>Detect and identify electronic devices in real-time</p>
+        </div>
+
+        <nav class="sidenav" id="sidenav">
+            <div class="sidenav-header">
+                <h2>
+                    <i class="fas fa-recycle"></i>
+                    E-Collector
+                </h2>
+            </div>
+    
+            <div class="user-profile">
+                <img src="https://ui-avatars.com/api/?name=User&background=random" alt="User">
+                <div class="user-info">
+                    <div class="user-name" >Vikraman</div>
+                    <div class="user-role" id="userRole">User</div>
+                </div>
+            </div>
+    
+            <div class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-camera"></i>
+                    <span>Scan Device</span>
+                </a>
+                <a href="scan-history.html" class="nav-item">
+                    <i class="fas fa-history"></i>
+                    <span>Scan History</span>
+                </a>
+                <a href="rewards.html" class="nav-item">
+                    <i class="fas fa-gift"></i>
+                    <span>Rewards</span>
+                </a>
+                <a href="collection-points.html" class="nav-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Collection Points</span>
+                </a>
+                <a href="impact-report.html" class="nav-item">
+                    <i class="fas fa-leaf"></i>
+                    <span>Impact Report</span>
+                </a>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            
+
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+                <img id="capturedImage" style="display: none;">
+                <canvas id="canvas"></canvas>
+                
+                <div class="verification-overlay" id="verificationOverlay">
+                    <button class="verify-btn accept" id="acceptCapture">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="verify-btn reject" id="rejectCapture">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <div>Processing image...</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="capture">
+                    <i class="fas fa-camera"></i>
+                    Capture Image
+                </button>
+                <button class="btn btn-primary" id="continueBtn">
+                    <i class="fas fa-arrow-right"></i>
+                    Continue
+                </button>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="result-container" id="results">
+                <div class="result-header">
+                    <h2>Detection Results</h2>
+                    <button class="btn btn-primary" id="newScan">
+                        <i class="fas fa-redo"></i>
+                        New Scan
+                    </button>
+                </div>
+                <div id="detectionResults"></div>
+            </div>
+
+            <div class="detailed-info-container" id="detailedInfo" style="display: none;">
+                <div class="result-header">
+                    <h2>Device Details</h2>
+                </div>
+                <form id="deviceDetailsForm" class="device-form">
+                    <div class="form-group">
+                        <label for="deviceName">Device Name</label>
+                        <input type="text" id="deviceName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deviceType">Device Type</label>
+                        <select id="deviceType" required>
+                            <option value="">Select Type</option>
+                            <option value="Mobile Devices">Mobile Device</option>
+                            <option value="Computing Devices">Computing Device</option>
+                            <option value="Audio Devices">Audio Device</option>
+                            <option value="Power & Charging">Power & Charging</option>
+                            <option value="Accessories">Accessory</option>
+                            <option value="Home Electronics">Home Electronic</option>
+                            <option value="Wearable Tech">Wearable Tech</option>
+                            <option value="Photography & Video">Photography & Video</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="serialNumber">Serial Number</label>
+                        <input type="text" id="serialNumber" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="purchaseDate">Purchase Date</label>
+                        <input type="date" id="purchaseDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Additional Notes</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Generate QR Code</button>
+                    </div>
+                </form>
+                
+                <div id="qrCodeContainer" style="display: none;">
+                    <h3>QR Code</h3>
+                    <div id="qrCode"></div>
+                    <button class="btn btn-primary" id="downloadQR">
+                        <i class="fas fa-download"></i>
+                        Download QR Code
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+    const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const capturedImage = document.getElementById('capturedImage');
+        const captureBtn = document.getElementById('capture');
+        const continueBtn = document.getElementById('continueBtn');
+        const verificationOverlay = document.getElementById('verificationOverlay');
+        const acceptBtn = document.getElementById('acceptCapture');
+        const rejectBtn = document.getElementById('rejectCapture');
+        const newScanBtn = document.getElementById('newScan');
+        const resultsDiv = document.getElementById('results');
+        const detectionResults = document.getElementById('detectionResults');
+        const loadingDiv = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const stages = document.querySelectorAll('.stage');
+
+        let stream = null;
+        const API_ENDPOINT = 'http://localhost:5000/detect';
+
+        function updateStage(stageNumber) {
+            stages.forEach((stage, index) => {
+                if (index + 1 <= stageNumber) {
+                    stage.classList.add('active');
+                } else {
+                    stage.classList.remove('active');
+                }
+            });
+        }
+
+        async function startVideo() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                showError("Error accessing camera. Please make sure you have granted camera permissions.");
+            }
+        }
+
+        function stopVideo() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+            }
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function captureImage() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg');
+            capturedImage.src = imageData;
+            
+            video.style.display = 'none';
+            capturedImage.style.display = 'block';
+            verificationOverlay.style.display = 'flex';
+            captureBtn.style.display = 'none';
+            continueBtn.style.display = 'none';
+            
+            updateStage(2);
+        }
+
+        async function confirmCapture() {
+            verificationOverlay.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            
+            try {
+                const imageData = capturedImage.src;
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image: imageData }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResults(data.detections);
+                    stopVideo();
+                    showContinueButton();
+                    loadingDiv.style.display = 'none';
+                } else {
+                    showError("Error processing image: " + data.error);
+                    resetCapture();
+                }
+            } catch (err) {
+                showError("Error processing image. Please try again.");
+                console.error(err);
+                resetCapture();
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        function processImage() {
+            updateStage(3);
+            resultsDiv.style.display = 'none';
+            document.getElementById('detailedInfo').style.display = 'block';
+            
+            // Auto-fill device type based on first detection's category
+            const firstDetection = document.querySelector('.result-item');
+            if (firstDetection) {
+                const categoryText = firstDetection.querySelector('div:nth-child(1) div').textContent;
+                const category = categoryText.replace('Category: ', '');
+                
+                // Set the device type based on category
+                const deviceType = document.getElementById('deviceType');
+                deviceType.value = category;
+                
+                // Set a default name based on the detection
+                const deviceName = firstDetection.querySelector('strong').textContent;
+                document.getElementById('deviceName').value = deviceName;
+            }
+            
+            // Generate random serial number
+            const serialNumber = generateSerialNumber();
+            document.getElementById('serialNumber').value = serialNumber;
+            
+            // Scroll to detailed info
+            document.getElementById('detailedInfo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function showResults(detections) {
+            detectionResults.innerHTML = '';
+            resultsDiv.style.display = 'block';
+            
+            if (detections.length === 0) {
+                detectionResults.innerHTML = '<div class="result-item">No electronics detected in the image.</div>';
+                return;
+            }
+            
+            detections.forEach(detection => {
+                const resultElement = document.createElement('div');
+                resultElement.className = 'result-item';
+                resultElement.innerHTML = `
+                    <div>
+                        <strong>${detection.label}</strong>
+                        <div>Category: ${detection.category}</div>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-level" style="width: ${detection.confidence * 100}%"></div>
+                    </div>
+                    <div>${(detection.confidence * 100).toFixed(1)}%</div>
+                `;
+                detectionResults.appendChild(resultElement);
+            });
+
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function resetCapture() {
+            video.style.display = 'block';
+            capturedImage.style.display = 'none';
+            verificationOverlay.style.display = 'none';
+            captureBtn.style.display = 'block';
+            continueBtn.style.display = 'none';
+            resultsDiv.style.display = 'none';
+            errorMessage.style.display = 'none';
+            loadingDiv.style.display = 'none';
+            updateStage(1);
+            startVideo();
+        }
+
+        // Event Listeners
+        captureBtn.addEventListener('click', captureImage);
+        acceptBtn.addEventListener('click', confirmCapture);
+        rejectBtn.addEventListener('click', resetCapture);
+        newScanBtn.addEventListener('click', resetCapture);
+        continueBtn.addEventListener('click', processImage);
+
+        // Initialize the camera when the page loads
+        startVideo();
+
+        // Add new functions for QR code handling
+        function generateSerialNumber() {
+            const prefix = 'ED'; // Electronics Detector prefix
+            const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0'); // 3 random digits
+            return `${prefix}-${timestamp}-${random}`;
+        }
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBc83nPlTffsucRptklXYVQf0xtxiLhFa4",
+            authDomain: "impactx-42f81.firebaseapp.com",
+            projectId: "impactx-42f81",
+            storageBucket: "impactx-42f81.firebasestorage.app",
+            messagingSenderId: "498385011197",
+            appId: "1:498385011197:web:c95a0f77a2a984adc4d994",
+            measurementId: "G-3YH0R3EMY4"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Update form submission handler
+        document.getElementById('deviceDetailsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            let confidence = 0;
+            const confidenceElement = document.querySelector('.result-item div:last-child');
+            if (confidenceElement) {
+                confidence = parseFloat(confidenceElement.textContent) / 100;
+            }
+            
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                showError("Please login to save device information");
+                return;
+            }
+
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+                const currentPoints = userData.points || 0;
+                
+                // Calculate points for this donation (100 points per device)
+                const donationPoints = 100;
+            
+            const deviceData = {
+                name: document.getElementById('deviceName').value,
+                type: document.getElementById('deviceType').value,
+                serialNumber: document.getElementById('serialNumber').value,
+                purchaseDate: document.getElementById('purchaseDate').value,
+                notes: document.getElementById('notes').value,
+                detectionDate: new Date().toISOString(),
+                detectionConfidence: confidence,
+                    donorId: user.uid,
+                    donorEmail: user.email,
+                    donorName: userData.name || user.displayName || 'Anonymous',
+                    donorPhone: userData.phone || '',
+                    status: 'under_review',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    points: donationPoints
+                };
+
+                // Create a batch to perform multiple operations
+                const batch = db.batch();
+
+                // Add to devices collection
+                const deviceRef = db.collection('devices').doc();
+                batch.set(deviceRef, {
+                    ...deviceData,
+                    deviceId: deviceRef.id
+                });
+
+                // Update user's total points
+                batch.update(db.collection('users').doc(user.uid), {
+                    points: firebase.firestore.FieldValue.increment(donationPoints),
+                    totalDonations: firebase.firestore.FieldValue.increment(1)
+                });
+
+                // Add to user's donations subcollection
+                const userDonationRef = db.collection('users')
+                    .doc(user.uid)
+                    .collection('donations')
+                    .doc(deviceRef.id);
+                    
+                batch.set(userDonationRef, {
+                    ...deviceData,
+                    deviceId: deviceRef.id,
+                    category: 'electronics'
+                });
+
+                // Add to donations collection (for global tracking)
+                const donationRef = db.collection('donations').doc(deviceRef.id);
+                batch.set(donationRef, {
+                    ...deviceData,
+                    deviceId: deviceRef.id,
+                    category: 'electronics'
+                });
+
+                // Commit the batch
+                await batch.commit();
+                
+                // Generate QR code with the device ID
+                generateQRCode(deviceRef.id);
+                
+                showSuccess("Device information saved successfully!");
+                document.getElementById('qrCodeContainer').style.display = 'block';
+                
+            } catch (error) {
+                console.error("Error saving device:", error);
+                showError("Error saving device information");
+            }
+        });
+
+        // Update QR code generation to only use document ID
+        function generateQRCode(deviceId) {
+            const qrContainer = document.getElementById('qrCode');
+            qrContainer.innerHTML = '';
+            
+            try {
+                // Create URL with just the device ID
+                const url = `${window.location.origin}/scan-result.html?id=${deviceId}`;
+                
+                // Create QR code with higher error correction and larger size
+                new QRCode(qrContainer, {
+                    text: url,
+                    width: 300,
+                    height: 300,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H, // Highest error correction level
+                    margin: 4 // Add some margin
+                });
+                
+                document.getElementById('qrCodeContainer').style.display = 'block';
+                document.getElementById('qrCodeContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                showError("Error generating QR code");
+                console.error("QR Code generation error:", error);
+            }
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.style.background = '#4CAF50';
+            successDiv.style.color = 'white';
+            successDiv.style.padding = '15px';
+            successDiv.style.borderRadius = '10px';
+            successDiv.style.marginTop = '20px';
+            successDiv.style.textAlign = 'center';
+            successDiv.textContent = message;
+            
+            const form = document.getElementById('deviceDetailsForm');
+            form.parentNode.insertBefore(successDiv, form.nextSibling);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        // Add QR code download handler
+        document.getElementById('downloadQR').addEventListener('click', function() {
+            const qrImage = document.querySelector('#qrCode img');
+            if (qrImage) {
+                const link = document.createElement('a');
+                link.download = 'device-qr-code.png';
+                link.href = qrImage.src;
+                link.click();
+            }
+        });
+
+        // Add animation to continue button
+        function showContinueButton() {
+            continueBtn.style.display = 'flex';
+            continueBtn.classList.add('slideIn');
+            continueBtn.style.opacity = '1';
+        }
+
+        // Add logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = 'auth.html';
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</body>
+</html>

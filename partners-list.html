@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partners List - E-Collector</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            color: #34495e;
+            font-size: 1.2em;
+        }
+
+        .partners-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.5em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 15px;
+        }
+
+        .partner-list {
+            background: white;
+            border-radius: 0 0 10px 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .partner-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .partner-item:hover {
+            background-color: #f9f9f9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .partner-item:last-child {
+            border-bottom: none;
+        }
+
+        .partner-details {
+            flex: 1;
+        }
+
+        .partner-name {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .partner-type {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .type-ngo {
+            background-color: #4CAF50;
+        }
+
+        .type-sponsor {
+            background-color: #2196F3;
+        }
+
+        .contact-info {
+            color: #7f8c8d;
+            font-size: 0.95em;
+        }
+
+        .contact-info i {
+            margin-right: 5px;
+            color: #4CAF50;
+        }
+
+        .empty-list {
+            padding: 30px;
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .navbar {
+            background: rgba(45, 90, 39, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .nav-logo {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-logo i {
+            margin-right: 12px;
+            font-size: 1.2em;
+            color: #4CAF50;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .nav-links a i {
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-recycle"></i>
+                E-Collector
+            </a>
+            <div class="nav-links">
+                <a href="index.html">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a href="admin-dashboard.html">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Admin Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Our Partners Network</h1>
+            <p>Together making a difference in e-waste management</p>
+        </div>
+
+        <div class="partners-section">
+            <h2 class="section-title"><i class="fas fa-building"></i> NGO Partners</h2>
+            <div class="partner-list" id="ngoPartnersList">
+                <!-- NGO partners will be dynamically loaded here -->
+                <div class="empty-list" id="emptyNgo">No NGO partners found</div>
+            </div>
+        </div>
+
+        <div class="partners-section">
+            <h2 class="section-title"><i class="fas fa-handshake"></i> Corporate Sponsors</h2>
+            <div class="partner-list" id="sponsorPartnersList">
+                <!-- Sponsor partners will be dynamically loaded here -->
+                <div class="empty-list" id="emptySponsor">No sponsors found</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBc83nPlTffsucRptklXYVQf0xtxiLhFa4",
+            authDomain: "impactx-42f81.firebaseapp.com",
+            projectId: "impactx-42f81",
+            storageBucket: "impactx-42f81.firebasestorage.app",
+            messagingSenderId: "498385011197",
+            appId: "1:498385011197:web:c95a0f77a2a984adc4d994",
+            measurementId: "G-3YH0R3EMY4"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Fetch accepted partners from Firestore
+        async function fetchAcceptedPartners() {
+            const ngoPartnersList = document.getElementById('ngoPartnersList');
+            const sponsorPartnersList = document.getElementById('sponsorPartnersList');
+            const emptyNgo = document.getElementById('emptyNgo');
+            const emptySponsor = document.getElementById('emptySponsor');
+
+            // Get only accepted applications
+            const snapshot = await db.collection('partner-applications')
+                .where('status', '==', 'accepted')
+                .get();
+
+            let ngoCount = 0;
+            let sponsorCount = 0;
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const partnerItem = document.createElement('div');
+                partnerItem.classList.add('partner-item');
+
+                const typeDisplay = data.type === 'ngo' ? 'NGO' : 'Sponsor';
+                const typeClass = data.type === 'ngo' ? 'type-ngo' : 'type-sponsor';
+
+                partnerItem.innerHTML = `
+                    <div class="partner-details">
+                        <div class="partner-name">${data.orgName}</div>
+                        <span class="partner-type ${typeClass}">${typeDisplay}</span>
+                        <div class="contact-info">
+                            <p><i class="fas fa-user"></i> ${data.contactName}</p>
+                            <p><i class="fas fa-envelope"></i> ${data.email}</p>
+                            <p><i class="fas fa-phone"></i> ${data.phone || 'N/A'}</p>
+                            ${data.website ? `<p><i class="fas fa-globe"></i> <a href="${data.website}" target="_blank">${data.website}</a></p>` : ''}
+                        </div>
+                    </div>
+                `;
+
+                if (data.type === 'ngo') {
+                    ngoPartnersList.appendChild(partnerItem);
+                    ngoCount++;
+                } else {
+                    sponsorPartnersList.appendChild(partnerItem);
+                    sponsorCount++;
+                }
+            });
+
+            // Show/hide empty messages
+            emptyNgo.style.display = ngoCount > 0 ? 'none' : 'block';
+            emptySponsor.style.display = sponsorCount > 0 ? 'none' : 'block';
+        }
+
+        // Load accepted partners on page load
+        window.onload = fetchAcceptedPartners;
+    </script>
+</body>
+</html> 

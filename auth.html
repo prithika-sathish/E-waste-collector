@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Waste Management - Login/Register</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a27 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+        }
+
+        .info-section {
+            flex: 1;
+            background: linear-gradient(135deg, #2d5a27 0%, #1a472a 100%);
+            padding: 40px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .info-section p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .impact-stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .impact-stat {
+            margin-bottom: 15px;
+        }
+
+        .impact-stat i {
+            margin-right: 10px;
+            color: #4CAF50;
+        }
+
+        .auth-section {
+            flex: 1;
+            padding: 40px;
+            background: white;
+        }
+
+        .auth-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h1 {
+            color: #2d5a27;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2d5a27;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #2d5a27;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #1a472a;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-footer a {
+            color: #2d5a27;
+            text-decoration: none;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        #registerForm {
+            display: none;
+        }
+
+        .password-strength {
+            font-size: 0.8em;
+            margin-top: 5px;
+            transition: color 0.3s;
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 1em;
+            color: #666;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: #2d5a27;
+            font-weight: 600;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #2d5a27;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2d5a27;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .auth-btn:hover {
+            background: #1a472a;
+        }
+
+        .role-selector {
+            margin: 15px 0;
+            display: flex;
+            gap: 20px;
+        }
+
+        .role-selector label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        #technicianCode {
+            margin-bottom: 15px;
+        }
+
+        #technicianCode small {
+            display: block;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        #userFields, #technicianFields {
+            margin: 15px 0;
+        }
+
+        select, input[type="tel"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        select {
+            background-color: white;
+        }
+
+        .role-selector {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        #technicianFields input {
+            margin-bottom: 10px;
+        }
+
+        .navbar {
+            background: rgba(45, 90, 39, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .nav-logo {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-logo i {
+            margin-right: 12px;
+            font-size: 1.2em;
+            color: #4CAF50;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .nav-links a i {
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <i class="fas fa-recycle"></i>
+                E-Collector
+            </a>
+            <div class="nav-links">
+                <a href="partner-application.html">
+                    <i class="fas fa-handshake"></i>
+                    Collaborate with Us
+                </a>
+                <a href="auth.html">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="info-section">
+            <h2>E-Waste Management Initiative</h2>
+            <p>Join our mission to create a sustainable future through responsible e-waste disposal and recycling.</p>
+            
+            <div class="impact-stats">
+                <div class="impact-stat">
+                    <i class="fas fa-recycle"></i>
+                    <span>Over 1000+ devices recycled</span>
+                </div>
+                <div class="impact-stat">
+                    <i class="fas fa-tree"></i>
+                    <span>500+ trees saved</span>
+                </div>
+                <div class="impact-stat">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Supporting 20+ NGOs</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-section">
+            <div class="auth-container">
+                <div class="auth-box">
+                    <div class="auth-header">
+                        <h2>Welcome to E-Collector</h2>
+                        <p>Sign in or create an account to continue</p>
+                    </div>
+                    
+                    <div class="auth-tabs">
+                        <button class="tab-btn active" data-tab="login">Login</button>
+                        <button class="tab-btn" data-tab="register">Register</button>
+                    </div>
+
+                    <div class="auth-form" id="loginForm">
+                        <input type="email" id="loginEmail" placeholder="Email" required>
+                        <input type="password" id="loginPassword" placeholder="Password" required>
+                        <button class="auth-btn" onclick="login()">Login</button>
+                    </div>
+
+                    <div class="auth-form" id="registerForm" style="display: none;">
+                        <input type="text" id="registerName" placeholder="Full Name" required>
+                        <input type="email" id="registerEmail" placeholder="Email" required>
+                        <input type="password" id="registerPassword" placeholder="Password" required>
+                        <input type="tel" id="phone" placeholder="Phone Number" required>
+                        <input type="text" id="address" placeholder="Address" required>
+                        
+                        <div class="role-selector">
+                            <label>
+                                <input type="radio" name="userRole" value="user" checked>
+                                Regular User
+                            </label>
+                            <label>
+                                <input type="radio" name="userRole" value="technician">
+                                Technician
+                            </label>
+                        </div>
+
+                        <!-- User-specific fields -->
+                        <div id="userFields">
+                            <select id="donorType" required>
+                                <option value="">Select Donor Type</option>
+                                <option value="individual">Individual</option>
+                                <option value="business">Business</option>
+                                <option value="institution">Institution</option>
+                            </select>
+                        </div>
+
+                        <!-- Technician-specific fields -->
+                        <div id="technicianFields" style="display: none;">
+                            <input type="text" id="employeeId" placeholder="Employee ID" required>
+                            <input type="text" id="specialization" placeholder="Specialization" required>
+                        </div>
+
+                        <button class="auth-btn" onclick="register()">Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBc83nPlTffsucRptklXYVQf0xtxiLhFa4",
+            authDomain: "impactx-42f81.firebaseapp.com",
+            projectId: "impactx-42f81",
+            storageBucket: "impactx-42f81.firebasestorage.app",
+            messagingSenderId: "498385011197",
+            appId: "1:498385011197:web:c95a0f77a2a984adc4d994",
+            measurementId: "G-3YH0R3EMY4"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Check authentication state
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                // Check if user is partner1@gmail.com
+                if (user.email === 'partner1@gmail.com') {
+                    window.location.href = 'partner-dashboard.html';
+                    return;
+                }
+                
+                // Check if user is technician
+                if (user.email === 'tech@gmail.com') {
+                    window.location.href = 'technician-dashboard.html';
+                    return;
+                }
+                
+                // For all other users, redirect to regular dashboard
+                window.location.href = 'dashboard.html';
+            }
+        });
+
+        // Add tab switching functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Hide all forms
+                document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+                // Show the selected form
+                const formId = button.getAttribute('data-tab') + 'Form';
+                document.getElementById(formId).style.display = 'block';
+            });
+        });
+
+        // Show/hide appropriate fields based on role selection
+        document.querySelectorAll('input[name="userRole"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const techFields = document.getElementById('technicianFields');
+                const userFields = document.getElementById('userFields');
+                
+                if (e.target.value === 'technician') {
+                    techFields.style.display = 'block';
+                    userFields.style.display = 'none';
+                } else {
+                    techFields.style.display = 'none';
+                    userFields.style.display = 'block';
+                }
+            });
+        });
+
+        // Update the login and register functions
+            async function login() {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                try {
+                    // First check if it's the admin
+                    if (email === 'admin@gmail.com' && password === '123456') {
+                        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                        window.location.href = 'admin-dashboard.html';
+                        return;
+                    }
+
+                    // For technician and regular users
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    const userDoc = await db.collection('users').doc(userCredential.user.uid).get();
+                    
+                    if (!userDoc.exists) {
+                        throw new Error('User data not found');
+                    }
+
+                    const userData = userDoc.data();
+                    console.log("User role:", userData.role); // Debug log
+
+                    // Specific check for technician email
+                    if (email === 'tech@gmail.com' || userData.role === 'technician') {
+                        sessionStorage.setItem('userRole', 'technician');
+                        window.location.replace('technician-dashboard.html');
+                    } else {
+                        sessionStorage.setItem('userRole', 'user');
+                        window.location.replace('dashboard.html');
+                    }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const role = document.querySelector('input[name="userRole"]:checked').value;
+            
+            // Basic validation
+            if (!email || !password || !name || !phone || !address) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Prepare base user data
+            const userData = {
+                name: name,
+                email: email,
+                phone: phone,
+                address: address,
+                role: role,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                totalPoints: 0
+            };
+
+            // Add role-specific data
+            if (role === 'technician') {
+                const employeeId = document.getElementById('employeeId').value;
+                const specialization = document.getElementById('specialization').value;
+
+                if (!employeeId || !specialization) {
+                    alert('Please fill in all technician fields');
+                    return;
+                }
+
+                // Add technician-specific data
+                Object.assign(userData, {
+                    employeeId: employeeId,
+                    specialization: specialization,
+                    devicesReviewed: 0,
+                    averageRating: 0
+                });
+            } else {
+                const donorType = document.getElementById('donorType').value;
+                
+                if (!donorType) {
+                    alert('Please select a donor type');
+                    return;
+                }
+
+                // Add user-specific data
+                Object.assign(userData, {
+                    donorType: donorType,
+                    totalDonations: 0,
+                    rewardsTier: 'bronze'
+                });
+            }
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await db.collection('users').doc(userCredential.user.uid).set(userData);
+
+                // Update user profile
+                await userCredential.user.updateProfile({
+                    displayName: name
+                });
+
+                if (role === 'technician') {
+                    window.location.href = 'technician-dashboard.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+    </script>
+</body>
+</html>

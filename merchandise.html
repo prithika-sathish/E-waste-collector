@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Waste Management - Eco Merchandise</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Side Navigation Styles */
+        .sidenav {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .sidenav-header {
+            padding: 10px 0;
+        }
+
+        .sidenav-header h2 {
+            color: #2d5a27;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-profile img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .user-role {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            color: #2c3e50;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(45, 90, 39, 0.1);
+        }
+
+        .nav-item.active {
+            background: #2d5a27;
+            color: white;
+        }
+
+        .nav-item i {
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            background: none;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .logout-btn:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Merchandise Section Styles */
+        .merchandise-section {
+            flex: 1;
+            padding: 20px;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .merch-header {
+            background: linear-gradient(135deg, #2d5a27 0%, #1a4314 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            margin: 15px 0;
+            opacity: 0.9;
+        }
+
+        .impact-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 15px 0;
+        }
+
+        .order-progress {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            color: white;
+        }
+
+        .progress-step.active i {
+            color: #4CAF50;
+            transform: scale(1.2);
+        }
+
+        .progress-step i {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .progress-line {
+            width: 50px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 0 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active + .progress-line {
+            background: #4CAF50;
+        }
+
+        .merch-categories {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            color: #2d5a27;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .category-btn.active {
+            background: #2d5a27;
+            color: white;
+        }
+
+        .merch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        .merch-item {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .merch-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .merch-image {
+            position: relative;
+            padding-top: 100%;
+            background: #f8f9fa;
+        }
+
+        .merch-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .eco-impact {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(45, 90, 39, 0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .merch-details {
+            padding: 20px;
+        }
+
+        .merch-details h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+
+        .impact-cost {
+            color: #2d5a27;
+            font-weight: bold;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .impact-cost i {
+            color: #4CAF50;
+        }
+
+        .redeem-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #2d5a27;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .redeem-btn:hover {
+            background: #234a1f;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 40px auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #2d5a27 0%, #1a4314 100%);
+            padding: 30px;
+            color: white;
+        }
+
+        .modal-header h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .impact-summary {
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: white;
+            font-weight: 500;
+        }
+
+        .impact-summary i {
+            color: #4CAF50;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: white;
+            font-size: 28px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .checkout-step {
+            padding: 30px;
+            background: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #2d5a27;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-row input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .continue-btn {
+            width: 100%;
+            padding: 16px;
+            background: #2d5a27;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .continue-btn:hover {
+            background: #234a1f;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            padding: 16px;
+            background: #2d5a27;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .place-order-btn:hover {
+            background: #234a1f;
+        }
+
+        .selected-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .selected-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-details h4 {
+            color: #2c3e50;
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .item-details p {
+            color: #2d5a27;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-details p i {
+            color: #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            .merchandise-section {
+                padding: 10px;
+            }
+
+            .merch-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 20px;
+                width: auto;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .checkout-step {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Side Navigation -->
+    <nav class="sidenav">
+        <div class="sidenav-header">
+            <h2><i class="fas fa-recycle"></i> E-Collector</h2>
+        </div>
+
+        <div class="user-profile">
+            <img src="https://ui-avatars.com/api/?name=User&background=random" alt="User">
+            <div class="user-info">
+                <div class="user-name" id="userName">Loading...</div>
+                <div class="user-role" id="userRole">User</div>
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-camera"></i>
+                <span>Scan Device</span>
+            </a>
+            <a href="scan-history.html" class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>Scan History</span>
+            </a>
+            <a href="merchandise.html" class="nav-item active">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Merchandise</span>
+            </a>
+            <a href="collection-points.html" class="nav-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Collection Points</span>
+            </a>
+            <a href="impact-report.html" class="nav-item">
+                <i class="fas fa-leaf"></i>
+                <span>Impact Report</span>
+            </a>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="merchandise-section">
+        <div class="merch-header">
+            <h1>Eco Merchandise Store</h1>
+            <p class="tagline">Recycle & Redeem – Get Exclusive Merch at Zero Cost!</p>
+            <div class="impact-display">
+                <i class="fas fa-leaf"></i>
+                Your Environmental Impact: <span id="userCurrentImpact">0</span> kg CO₂
+            </div>
+            <div class="order-progress">
+                <div class="progress-step active">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Choose</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <i class="fas fa-gift"></i>
+                    <span>Redeem</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Address</span>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Confirm</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="merch-categories">
+            <button class="category-btn active" data-category="all">All Items</button>
+            <button class="category-btn" data-category="apparel">Apparel</button>
+            <button class="category-btn" data-category="accessories">Accessories</button>
+            <button class="category-btn" data-category="bags">Bags</button>
+            <button class="category-btn" data-category="stationery">Stationery</button>
+            <button class="category-btn" data-category="bottles">Bottles</button>
+        </div>
+
+        <div class="merch-grid">
+            <!-- Apparel -->
+            <div class="merch-item" data-category="apparel">
+                <div class="merch-image">
+                    <img src="Assets/Hoodie.jpg" alt="Eco Hoodie">
+                    <div class="eco-impact">Saves 600kg CO₂</div>
+                </div>
+                <div class="merch-details">
+                    <h3>Recycled Eco Hoodie</h3>
+                    <p>100% recycled cotton blend</p>
+                    <div class="impact-cost">
+                        <i class="fas fa-leaf"></i>
+                        Required Impact: 600 kg CO₂
+                    </div>
+                    <button class="redeem-btn" onclick="redeemMerch('hoodie', 600)">Redeem Now</button>
+                </div>
+            </div>
+
+            <!-- Accessories -->
+            <div class="merch-item" data-category="accessories">
+                <div class="merch-image">
+                    <img src="Assets/keychain.jpg" alt="Eco Keychain">
+                    <div class="eco-impact">Saves 200kg CO₂</div>
+                </div>
+                <div class="merch-details">
+                    <h3>Recycled Keychain</h3>
+                    <p>Made from recycled circuit boards</p>
+                    <div class="impact-cost">
+                        <i class="fas fa-leaf"></i>
+                        Required Impact: 200 kg CO₂
+                    </div>
+                    <button class="redeem-btn" onclick="redeemMerch('keychain', 200)">Redeem Now</button>
+                </div>
+            </div>
+
+            <!-- Bags -->
+            <div class="merch-item" data-category="bags">
+                <div class="merch-image">
+                    <img src="Assets/Totebag.jpg" alt="Eco Tote Bag">
+                    <div class="eco-impact">Saves 360kg CO₂</div>
+                </div>
+                <div class="merch-details">
+                    <h3>Eco Tote Bag</h3>
+                    <p>Made from recycled plastic bottles</p>
+                    <div class="impact-cost">
+                        <i class="fas fa-leaf"></i>
+                        Required Impact: 360 kg CO₂
+                    </div>
+                    <button class="redeem-btn" onclick="redeemMerch('totebag', 360)">Redeem Now</button>
+                </div>
+            </div>
+
+            <!-- Stationery -->
+            <div class="merch-item" data-category="stationery">
+                <div class="merch-image">
+                    <img src="Assets/fidgetpen.jpg" alt="Fidget Pen">
+                    <div class="eco-impact">Saves 120kg CO₂</div>
+                </div>
+                <div class="merch-details">
+                    <h3>Eco Fidget Pen</h3>
+                    <p>Made from recycled plastics</p>
+                    <div class="impact-cost">
+                        <i class="fas fa-leaf"></i>
+                        Required Impact: 120 kg CO₂
+                    </div>
+                    <button class="redeem-btn" onclick="redeemMerch('pen', 120)">Redeem Now</button>
+                </div>
+            </div>
+
+            <!-- Bottles -->
+            <div class="merch-item" data-category="bottles">
+                <div class="merch-image">
+                    <img src="Assets/bottle.jpg" alt="Water Bottle">
+                    <div class="eco-impact">Saves 440kg CO₂</div>
+                </div>
+                <div class="merch-details">
+                    <h3>Eco Water Bottle</h3>
+                    <p>Made from recycled stainless steel</p>
+                    <div class="impact-cost">
+                        <i class="fas fa-leaf"></i>
+                        Required Impact: 440 kg CO₂
+                    </div>
+                    <button class="redeem-btn" onclick="redeemMerch('bottle', 440)">Redeem Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Modal -->
+        <div id="checkoutModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Complete Your Order</h2>
+                    <div class="impact-summary">
+                        <i class="fas fa-leaf"></i>
+                        Your Environmental Impact: <span id="modalUserImpact">0</span> kg CO₂
+                    </div>
+                    <span class="close">&times;</span>
+                </div>
+
+                <div id="addressStep" class="checkout-step">
+                    <h3>Shipping Address</h3>
+                    <form id="addressForm">
+                        <div class="form-group">
+                            <input type="text" id="fullName" placeholder="Full Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="streetAddress" placeholder="Street Address" required>
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="city" placeholder="City" required>
+                            <input type="text" id="state" placeholder="State" required>
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="zipCode" placeholder="ZIP Code" required>
+                            <input type="tel" id="phone" placeholder="Phone Number" required>
+                        </div>
+                        <button type="submit" class="continue-btn">Continue to Confirmation</button>
+                    </form>
+                </div>
+
+                <div id="confirmationStep" class="checkout-step" style="display: none;">
+                    <h3>Order Confirmation</h3>
+                    <div class="order-summary">
+                        <div class="selected-item">
+                            <img id="confirmItemImage" src="" alt="Selected Item">
+                            <div class="item-details">
+                                <h4 id="confirmItemName"></h4>
+                                <p id="confirmItemPoints"></p>
+                            </div>
+                        </div>
+                        <div class="shipping-summary">
+                            <h4>Shipping To:</h4>
+                            <p id="confirmAddress"></p>
+                        </div>
+                        <div class="points-summary">
+                            <p>Impact Required: <span id="confirmTotalPoints"></span></p>
+                            <p>Remaining Impact: <span id="confirmRemainingPoints"></span></p>
+                        </div>
+                        <button onclick="placeOrder()" class="place-order-btn">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <!-- Your Firebase config and initialization script -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Your merchandise JavaScript code -->
+    <script src="merchandise.js"></script>
+
+    <!-- Add this right before the closing </body> tag -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBc83nPlTffsucRptklXYVQf0xtxiLhFa4",
+            authDomain: "impactx-42f81.firebaseapp.com",
+            projectId: "impactx-42f81",
+            storageBucket: "impactx-42f81.firebaseapp.com",
+            messagingSenderId: "498385011197",
+            appId: "1:498385011197:web:c95a0f77a2a984adc4d994",
+            measurementId: "G-3YH0R3EMY4"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        let userCO2Points = 0;
+
+        // Check authentication and fetch user data
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            try {
+                // Get user data
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (!userDoc.exists) {
+                    console.error('User document not found');
+                    auth.signOut();
+                    return;
+                }
+
+                const userData = userDoc.data();
+                
+                // Update user profile
+                document.getElementById('userName').textContent = userData.fullName || 'User';
+                document.getElementById('userRole').textContent = userData.role || 'User';
+
+                // Set environmental impact points
+                userCO2Points = userData.environmentalImpact || 0;
+                updateDisplayedPoints();
+                
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                alert('Error loading user data. Please refresh the page.');
+            }
+        });
+
+        // Update all displayed points
+        function updateDisplayedPoints() {
+            document.getElementById('userCurrentImpact').textContent = userCO2Points.toFixed(1);
+            document.getElementById('modalUserImpact').textContent = userCO2Points.toFixed(1);
+        }
+
+        // Function to redeem merchandise
+        async function redeemMerch(itemId, requiredPoints) {
+            if (userCO2Points < requiredPoints) {
+                alert(`You need ${requiredPoints} kg CO₂ impact points to redeem this item. You currently have ${userCO2Points.toFixed(1)} kg CO₂.`);
+                return;
+            }
+
+            try {
+                const merchItem = document.querySelector(`[onclick="redeemMerch('${itemId}', ${requiredPoints})"]`)
+                    .closest('.merch-item');
+                
+                // Show confirmation modal
+                const modal = document.getElementById('checkoutModal');
+                modal.style.display = 'block';
+
+                // Update confirmation details
+                document.getElementById('confirmItemName').textContent = merchItem.querySelector('h3').textContent;
+                document.getElementById('confirmItemImage').src = merchItem.querySelector('img').src;
+                document.getElementById('confirmItemPoints').textContent = `Environmental Impact: ${requiredPoints} kg CO₂`;
+                document.getElementById('confirmTotalPoints').textContent = `${requiredPoints} kg CO₂`;
+                document.getElementById('confirmRemainingPoints').textContent = `${(userCO2Points - requiredPoints).toFixed(1)} kg CO₂`;
+
+                // Store selected item details
+                window.selectedItem = {
+                    itemId,
+                    requiredPoints,
+                    name: merchItem.querySelector('h3').textContent,
+                    image: merchItem.querySelector('img').src
+                };
+
+            } catch (error) {
+                console.error("Error during redemption:", error);
+                alert('An error occurred during redemption. Please try again.');
+            }
+        }
+
+        // Function to place the order
+        async function placeOrder() {
+            if (!window.selectedItem) return;
+
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert('Please log in to place an order.');
+                    return;
+                }
+
+                // Get form data
+                const shippingDetails = {
+                    fullName: document.getElementById('fullName').value,
+                    streetAddress: document.getElementById('streetAddress').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zipCode: document.getElementById('zipCode').value,
+                    phone: document.getElementById('phone').value
+                };
+
+                // Create order in database
+                const orderRef = db.collection('orders').doc();
+                await orderRef.set({
+                    userId: user.uid,
+                    itemId: window.selectedItem.itemId,
+                    itemName: window.selectedItem.name,
+                    impactPoints: window.selectedItem.requiredPoints,
+                    shipping: shippingDetails,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Update user's environmental impact points
+                await db.collection('users').doc(user.uid).update({
+                    environmentalImpact: firebase.firestore.FieldValue.increment(-window.selectedItem.requiredPoints)
+                });
+
+                // Update local points
+                userCO2Points -= window.selectedItem.requiredPoints;
+                updateDisplayedPoints();
+                
+                // Close modal and show success message
+                document.getElementById('checkoutModal').style.display = 'none';
+                alert('Order placed successfully! You will receive a confirmation email shortly.');
+                
+                // Reset form and selected item
+                document.getElementById('addressForm').reset();
+                window.selectedItem = null;
+
+            } catch (error) {
+                console.error("Error placing order:", error);
+                alert('An error occurred while placing your order. Please try again.');
+            }
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = 'auth.html';
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        });
+
+        // Close modal when clicking the close button or outside the modal
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('checkoutModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('checkoutModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Handle address form submission
+        document.getElementById('addressForm').onsubmit = function(e) {
+            e.preventDefault();
+            document.getElementById('addressStep').style.display = 'none';
+            document.getElementById('confirmationStep').style.display = 'block';
+            
+            // Update confirmation address
+            const addressString = `${document.getElementById('fullName').value}, ${document.getElementById('streetAddress').value}, ${document.getElementById('city').value}, ${document.getElementById('state').value} ${document.getElementById('zipCode').value}`;
+            document.getElementById('confirmAddress').textContent = addressString;
+        }
+
+        // Filter merchandise by category
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button
+                document.querySelector('.category-btn.active').classList.remove('active');
+                button.classList.add('active');
+
+                const category = button.dataset.category;
+                const items = document.querySelectorAll('.merch-item');
+
+                items.forEach(item => {
+                    if (category === 'all' || item.dataset.category === category) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

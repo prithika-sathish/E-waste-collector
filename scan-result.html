@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Information</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .device-info {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .info-group {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-group:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .confidence-level {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.6s ease-out;
+        }
+
+        .detection-date {
+            color: #666;
+            font-size: 0.9em;
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px auto;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .personal-info {
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-header h2 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .login-status {
+            background: #f0f0f0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-row .info-label {
+            flex: 1;
+            color: #666;
+        }
+
+        .info-row .info-value {
+            flex: 2;
+            color: #2c3e50;
+        }
+
+        .device-info {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .info-group {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #2c3e50;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .status-pending {
+            color: #ff4444;
+            font-weight: bold;
+            padding: 5px 10px;
+            background: #ffebee;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .status-approved {
+            color: #00C851;
+            font-weight: bold;
+            padding: 5px 10px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .quality-input {
+            margin-top: 10px;
+        }
+
+        .points-input {
+            width: 150px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .points-hint {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .feedback-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .action-btn.approve {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .action-btn.reject {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .status-rejected {
+            color: #f44336;
+            font-weight: bold;
+            padding: 5px 10px;
+            background: #ffebee;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .conversion-info {
+            margin-top: 10px;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .points-preview {
+            color: #4CAF50;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            color: white;
+            font-size: 2em;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            color: white;
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Device Information</h1>
+        </div>
+
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading device information...</p>
+        </div>
+
+        <div id="deviceInfo" class="device-info" style="display: none;">
+            <!-- Device information will be populated here -->
+        </div>
+
+        <!-- Add technician panel -->
+        <div id="technicianPanel" class="device-info" style="display: none;">
+            <div class="card-header">
+                <h2>Technician Review Panel</h2>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Device Value Assessment</div>
+                <div class="quality-input">
+                    <input type="number" id="deviceValue" min="0" placeholder="Estimated Value (₹)" class="points-input">
+                    <div class="points-hint">Based on device condition, age, and specifications</div>
+                    <div class="conversion-info">
+                        Conversion Rate: ₹10 = 1 point
+                        <br>
+                        <span id="pointsPreview" class="points-preview">Equivalent Points: 0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Feedback (Optional)</div>
+                <textarea id="techFeedback" class="feedback-input" placeholder="Enter any technical notes or feedback"></textarea>
+            </div>
+            <div class="review-actions">
+                <button id="rejectBtn" class="action-btn reject">Reject Device</button>
+                <button id="approveBtn" class="action-btn approve">Approve Device</button>
+            </div>
+        </div>
+
+        <div id="personalInfo" class="device-info" style="display: none;">
+            <div class="card-header">
+                <h2>Personal Information</h2>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Name</div>
+                <div class="info-value" id="userName">-</div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Email</div>
+                <div class="info-value" id="userEmail">-</div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">Phone</div>
+                <div class="info-value" id="userPhone">-</div>
+            </div>
+        </div>
+
+        <div id="error" style="display: none;" class="error-message"></div>
+    </div>
+
+    <div id="loadingOverlay" class="overlay">
+        <div style="text-align: center;">
+            <i class="fas fa-spinner spinner"></i>
+            <div class="spinner-text">Updating status...</div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBc83nPlTffsucRptklXYVQf0xtxiLhFa4",
+            authDomain: "impactx-42f81.firebaseapp.com",
+            projectId: "impactx-42f81",
+            storageBucket: "impactx-42f81.firebasestorage.app",
+            messagingSenderId: "498385011197",
+            appId: "1:498385011197:web:c95a0f77a2a984adc4d994",
+            measurementId: "G-3YH0R3EMY4"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        async function fetchDeviceInfo() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const deviceId = urlParams.get('id');
+
+            if (!deviceId) {
+                showError("No device ID provided");
+                return;
+            }
+
+            try {
+                // Try to fetch from donations collection first
+                const donationDoc = await db.collection('donations').doc(deviceId).get();
+                
+                if (!donationDoc.exists) {
+                    // Fallback to devices collection
+                    const deviceDoc = await db.collection('devices').doc(deviceId).get();
+                    if (!deviceDoc.exists) {
+                        showError("Device not found");
+                        return;
+                    }
+                    displayDeviceInfo(deviceDoc.data());
+                } else {
+                    displayDeviceInfo(donationDoc.data());
+                }
+            } catch (error) {
+                console.error("Error fetching device:", error);
+                showError("Error loading device information");
+            }
+        }
+
+        function displayDeviceInfo(data) {
+            // If data is a DocumentSnapshot, get its data
+            const deviceData = data.data ? data.data() : data;
+            
+            const deviceInfo = document.getElementById('deviceInfo');
+            const statusClass = deviceData.status === 'approved' ? 'status-approved' : 
+                              deviceData.status === 'rejected' ? 'status-rejected' : 'status-pending';
+            const statusText = deviceData.status === 'approved' ? 'Approved' :
+                              deviceData.status === 'rejected' ? 'Rejected' : 'Under Review';
+            
+            deviceInfo.innerHTML = `
+                <div class="card-header">
+                    <h2>Device Information</h2>
+                    <div class="${statusClass}">${statusText}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Device Name</div>
+                    <div class="info-value">${deviceData.name || 'Not specified'}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Device Type</div>
+                    <div class="info-value">${deviceData.type || 'Not specified'}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Serial Number</div>
+                    <div class="info-value">${deviceData.serialNumber || 'Not specified'}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Purchase Date</div>
+                    <div class="info-value">${deviceData.purchaseDate ? new Date(deviceData.purchaseDate).toLocaleDateString() : 'Not specified'}</div>
+                </div>
+                ${deviceData.userId ? `
+                <div class="info-group">
+                    <div class="info-label">Donor Information</div>
+                    <div class="info-value donor-info">
+                        <p>Name: ${deviceData.donorName || 'Loading...'}</p>
+                        <p>Email: ${deviceData.donorEmail || 'Loading...'}</p>
+                        <p>Phone: ${deviceData.donorPhone || 'Loading...'}</p>
+                    </div>
+                </div>
+                ` : ''}
+                <div class="info-group">
+                    <div class="info-label">Donation Date</div>
+                    <div class="info-value">${deviceData.createdAt ? new Date(deviceData.createdAt.toDate()).toLocaleString() : 'Not available'}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Notes</div>
+                    <div class="info-value">${deviceData.notes || 'No additional notes'}</div>
+                </div>
+                ${deviceData.techFeedback ? `
+                <div class="info-group">
+                    <div class="info-label">Technical Feedback</div>
+                    <div class="info-value">${deviceData.techFeedback}</div>
+                </div>
+                ` : ''}
+                ${deviceData.deviceValue ? `
+                <div class="info-group">
+                    <div class="info-label">Estimated Value</div>
+                    <div class="info-value">₹${deviceData.deviceValue.toLocaleString()}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Points Awarded</div>
+                    <div class="info-value">${deviceData.points} points</div>
+                </div>
+                ` : ''}
+            `;
+
+            // If there's a userId, fetch and display the donor's information
+            if (deviceData.userId) {
+                fetchAndDisplayDonorInfo(deviceData.userId);
+            }
+
+            document.getElementById('loading').style.display = 'none';
+            deviceInfo.style.display = 'block';
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Add function to fetch user details
+        async function fetchUserDetails(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    document.getElementById('userName').textContent = userData.name || '-';
+                    document.getElementById('userEmail').textContent = userData.email || '-';
+                    document.getElementById('userPhone').textContent = userData.phone || '-';
+                    document.getElementById('personalInfo').style.display = 'block';
+                }
+            } catch (error) {
+                console.error("Error fetching user details:", error);
+            }
+        }
+
+        async function checkTechnicianStatus() {
+            const user = auth.currentUser;
+            if (user) {
+                // Allow tech@gmail.com direct access
+                if (user.email === 'tech@gmail.com') {
+                    return true;
+                }
+                
+                // Check user role from database
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+                return userData && userData.role === 'technician';
+            }
+            return false;
+        }
+
+        async function updateUserPoints(userId, pointsToAdd, deviceData) {
+    try {
+        const userRef = db.collection('users').doc(userId);
+        const userDoc = await userRef.get();
+        
+        if (!userDoc.exists) {
+            throw new Error("User document not found");
+        }
+
+        const userData = userDoc.data();
+        const currentPoints = userData.points || 0; // Get current points, default to 0 if not set
+
+        // Calculate new total points
+        const newTotalPoints = currentPoints + pointsToAdd;
+
+        // Update user document with new total points
+        await userRef.update({
+            points: newTotalPoints,
+            totalDonations: firebase.firestore.FieldValue.increment(1),
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Add points transaction history
+        await db.collection('users')
+            .doc(userId)
+            .collection('pointsHistory')
+            .add({
+                points: pointsToAdd,
+                type: 'DEVICE_DONATION',
+                deviceId: deviceData.id,
+                deviceName: deviceData.name || 'Unknown Device',
+                deviceType: deviceData.type || 'Unknown Type',
+                deviceValue: deviceData.deviceValue || 0,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                description: `Points awarded for donating ${deviceData.type || 'device'} - ${deviceData.name || 'Unknown Device'}`,
+                status: 'APPROVED'
+            });
+
+        console.log(`Successfully updated points for user ${userId}. New total points: ${newTotalPoints}`);
+    } catch (error) {
+        console.error("Error updating user points:", error);
+        throw error;
+    }
+}
+
+        function calculatePoints(value) {
+            // Conversion rate: ₹10 = 1 point
+            return Math.floor(value / 10);
+        }
+
+        document.getElementById('deviceValue').addEventListener('input', function(e) {
+            const value = parseFloat(e.target.value) || 0;
+            const points = calculatePoints(value);
+            document.getElementById('pointsPreview').textContent = `Equivalent Points: ${points}`;
+        });
+
+        function showLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoadingOverlay() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        async function updateDeviceStatus(deviceId, status, deviceValue, feedback) {
+    showLoadingOverlay();
+    try {
+        // Try updating in donations collection first
+        let docRef = db.collection('donations').doc(deviceId);
+        let doc = await docRef.get();
+        
+        if (!doc.exists) {
+            // Fallback to devices collection
+            docRef = db.collection('devices').doc(deviceId);
+            doc = await docRef.get();
+        }
+
+        if (doc.exists) {
+            const points = calculatePoints(deviceValue);
+            const deviceData = doc.data();
+            console.log(deviceData)
+            const donorId=deviceData.donorId;
+            deviceData.id = deviceId;
+            deviceData.deviceValue = deviceValue;
+            
+           
+            // Create update data while preserving existing data
+            const updateData = {
+                ...deviceData,  // Keep existing data
+                status: status,
+                deviceValue: deviceValue || 0,
+                points: points || 0,
+                techFeedback: feedback || '',
+                reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                reviewedBy: auth.currentUser.uid
+            };
+            
+            // Update device document
+            await docRef.update(updateData);
+            await db.collection("users").doc(donorId).get().then(async (t)=>{
+                let data=await t.data();
+                let Userpoints=data.points+points;
+                await db.collection("users").doc(donorId).update({points:Userpoints}).then(()=>alert("Updated Successfully"))
+
+            })
+
+            // If approved and userId exists, update user points
+            if (status === 'approved' && deviceData.userId) {
+                try {
+                    await updateUserPoints(deviceData.userId, points, deviceData);
+                    console.log(`Points updated successfully. Added ${points} points to user ${deviceData.userId}`);
+                } catch (error) {
+                    console.error("Error updating points:", error);
+                    showError("Failed to update points");
+                    return;
+                }
+            }
+
+            // Get the updated document and display it
+            const updatedDoc = await docRef.get();
+            displayDeviceInfo(updatedDoc);
+            
+            // Hide technician panel after update
+            document.getElementById('technicianPanel').style.display = 'none';
+        }
+    } catch (error) {
+        console.error("Error updating device status:", error);
+        showError("Failed to update device status");
+    } finally {
+        hideLoadingOverlay();
+    }
+}
+
+document.getElementById('approveBtn').addEventListener('click', async () => {
+    const deviceId = new URLSearchParams(window.location.search).get('id');
+    const deviceValue = parseFloat(document.getElementById('deviceValue').value);
+    const feedback = document.getElementById('techFeedback').value;
+    
+    if (!deviceValue || isNaN(deviceValue)) {
+        alert('Please enter a valid device value before approving');
+        return;
+    }
+    
+    
+    await updateDeviceStatus(deviceId, 'approved', deviceValue, feedback);
+});
+
+        document.getElementById('rejectBtn').addEventListener('click', async () => {
+            const deviceId = new URLSearchParams(window.location.search).get('id');
+            const feedback = document.getElementById('techFeedback').value;
+            
+            if (!feedback) {
+                alert('Please provide feedback for rejection');
+                return;
+            }
+            
+            await updateDeviceStatus(deviceId, 'rejected', 0, feedback);
+        });
+
+        async function initializePage() {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const isTechnician = await checkTechnicianStatus();
+                    if (isTechnician) {
+                        const techPanel = document.getElementById('technicianPanel');
+                        techPanel.style.display = 'block';
+
+                        // Add event listeners for technician actions
+                        document.getElementById('approveBtn').addEventListener('click', async () => {
+                            const deviceId = new URLSearchParams(window.location.search).get('id');
+                            const deviceValue = document.getElementById('deviceValue').value;
+                            const feedback = document.getElementById('techFeedback').value;
+                            
+                            if (!deviceValue) {
+                                alert('Please enter device value before approving');
+                                return;
+                            }
+                            
+                            await updateDeviceStatus(deviceId, 'approved', parseFloat(deviceValue), feedback);
+                        });
+
+                        document.getElementById('rejectBtn').addEventListener('click', async () => {
+                            const deviceId = new URLSearchParams(window.location.search).get('id');
+                            const feedback = document.getElementById('techFeedback').value;
+                            
+                            if (!feedback) {
+                                alert('Please provide feedback for rejection');
+                                return;
+                            }
+                            
+                            await updateDeviceStatus(deviceId, 'rejected', 0, feedback);
+                        });
+                    }
+                    fetchDeviceInfo();
+                } else {
+                    window.location.href = 'auth.html';
+                }
+            });
+        }
+
+        // Initialize the page when loaded
+        initializePage();
+
+        // Add this new function to fetch donor information
+        async function fetchAndDisplayDonorInfo(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    
+                    // Update the personal info section
+                    document.getElementById('userName').textContent = userData.fullName || 'Not specified';
+                    document.getElementById('userEmail').textContent = userData.email || 'Not specified';
+                    document.getElementById('userPhone').textContent = userData.phone || 'Not specified';
+                    document.getElementById('personalInfo').style.display = 'block';
+
+                    // Update the donor information in the device info section
+                    const donorInfo = document.querySelector('.donor-info');
+                    if (donorInfo) {
+                        donorInfo.innerHTML = `
+                            <p>Name: ${userData.fullName || 'Not specified'}</p>
+                            <p>Email: ${userData.email || 'Not specified'}</p>
+                            <p>Phone: ${userData.phone || 'Not specified'}</p>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching donor information:", error);
+            }
+        }
+    </script>
+</body>
+</html> 

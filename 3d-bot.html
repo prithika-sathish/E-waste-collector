@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Talking Bot</title>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden;
+        }
+        canvas { 
+            display: block; 
+        }
+        #controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <button id="victoryBtn">Play Victory Animation</button>
+    </div>
+
+    <!-- Three.js and required libraries -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.159.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // Camera position
+        camera.position.z = 3;
+        camera.position.y = 1.5;
+
+        // Orbit controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // Animation variables
+        let mixer;
+        let avatar;
+        let victoryAction;
+        let idleAction;
+
+        // Load avatar model
+        const loader = new GLTFLoader();
+        
+        // Load base avatar with idle animation
+        loader.load('avatar.glb', (gltf) => {
+            avatar = gltf.scene;
+            scene.add(avatar);
+
+            // Set up animation mixer
+            mixer = new THREE.AnimationMixer(avatar);
+            
+            // Set up idle animation
+            if (gltf.animations.length > 0) {
+                idleAction = mixer.clipAction(gltf.animations[0]);
+                idleAction.play();
+            }
+
+            // Load victory animation
+            loader.load('victory.glb', (victoryGltf) => {
+                if (victoryGltf.animations.length > 0) {
+                    // Create victory animation action
+                    victoryAction = mixer.clipAction(victoryGltf.animations[0]);
+                    victoryAction.loop = THREE.LoopOnce;
+                    victoryAction.clampWhenFinished = true;
+                }
+            });
+        });
+
+        // Victory button click handler
+        document.getElementById('victoryBtn').addEventListener('click', () => {
+            if (victoryAction) {
+                // Fade out idle animation
+                idleAction.fadeOut(0.5);
+                // Play victory animation
+                victoryAction.reset();
+                victoryAction.fadeIn(0.5);
+                victoryAction.play();
+                
+                // Return to idle after victory animation
+                setTimeout(() => {
+                    victoryAction.fadeOut(0.5);
+                    idleAction.fadeIn(0.5);
+                    idleAction.play();
+                }, 2000); // Adjust timing based on victory animation length
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation loop
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Update mixer
+            if (mixer) {
+                mixer.update(clock.getDelta());
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

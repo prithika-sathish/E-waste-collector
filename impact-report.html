@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact Report | E-Waste Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d5a27;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-menu {
+            margin-top: 30px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .impact-header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .impact-title {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .impact-subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .impact-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .impact-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .impact-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .impact-icon {
+            width: 50px;
+            height: 50px;
+            background: #e8f5e9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .impact-icon i {
+            font-size: 1.5em;
+            color: #2d5a27;
+        }
+
+        .impact-value {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .impact-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .chart-header {
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .achievement-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-icon {
+            font-size: 2.5em;
+            color: #2d5a27;
+            margin-bottom: 15px;
+        }
+
+        .achievement-title {
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .achievement-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.6s ease-out;
+        }
+
+        /* Impact Breakdown Card Styles */
+        .impact-breakdown-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .impact-breakdown-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .impact-preview {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(45, 90, 39, 0.05);
+            border-radius: 12px;
+        }
+
+        .mini-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .mini-stat i {
+            font-size: 1.2em;
+            color: #2d5a27;
+        }
+
+        /* Impact Modal Styles */
+        .impact-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .impact-modal-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin: 3% auto;
+            padding: 35px;
+            width: 95%;
+            max-width: 1200px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.4s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .impact-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(45, 90, 39, 0.1);
+        }
+
+        .impact-modal-header h2 {
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8em;
+        }
+
+        .impact-modal-header h2 i {
+            color: #2d5a27;
+        }
+
+        .close-impact-modal {
+            font-size: 32px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-impact-modal:hover {
+            background: rgba(0,0,0,0.1);
+            transform: rotate(90deg);
+        }
+
+        .impact-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .impact-stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .impact-stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: #e8f5e9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon i {
+            font-size: 1.8em;
+            color: #2d5a27;
+        }
+
+        .stat-details {
+            flex: 1;
+        }
+
+        .stat-details h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            color: #2d5a27;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .stat-progress {
+            position: relative;
+        }
+
+        .progress-ring {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-ring-circle {
+            fill: none;
+            stroke: #4CAF50;
+            stroke-width: 5;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.3s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            font-size: 0.9em;
+            color: #2d5a27;
+            font-weight: bold;
+        }
+
+        .impact-timeline {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .timeline {
+            margin-top: 20px;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: #4CAF50;
+        }
+
+        .impact-charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .chart-wrapper {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .chart-wrapper h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .environmental-impact-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .environmental-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(45, 90, 39, 0.05);
+            border-radius: 12px;
+        }
+
+        .env-metric {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .env-metric:hover {
+            transform: translateX(5px);
+        }
+
+        .env-metric i {
+            font-size: 1.5rem;
+            color: #2d5a27;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e8f5e9;
+            border-radius: 8px;
+        }
+
+        .metric-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d5a27;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-header span,
+            .nav-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .impact-modal-content {
+                margin: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+                padding: 20px;
+            }
+
+            .impact-stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .impact-charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .user-profile {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .user-role {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>
+                <i class="fas fa-recycle"></i>
+                E-Collector
+            </h2>
+        </div>
+
+        <div class="user-profile" style="border-radius: 50%;">
+            <img src="https://ui-avatars.com/api/?name=User&background=random" alt="User">
+            <div class="user-info">
+                <div class="user-name" id="userName">Loading...</div>
+                <div class="user-role" id="userRole">User</div>
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-camera"></i>
+                Scan Device
+            </a>
+            <a href="scan-history.html" class="nav-item">
+                <i class="fas fa-history"></i>
+                Scan History
+            </a>
+            <a href="collection-points.html" class="nav-item">
+                <i class="fas fa-map-marker-alt"></i>
+                Collection Points
+            </a>
+            <a href="impact-report.html" class="nav-item active">
+                <i class="fas fa-leaf"></i>
+                Impact Report
+            </a>
+            <a href="#" class="nav-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="impact-header">
+            <h1 class="impact-title">Your Environmental Impact</h1>
+            <p class="impact-subtitle">See how your e-waste donations are making a difference</p>
+        </div>
+
+        <div class="impact-grid">
+            <div class="impact-card">
+                <div class="impact-card-header">
+                    <div class="impact-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div>
+                        <div class="impact-value" id="co2Saved">0</div>
+                        <div class="impact-label">kg CO₂ Emissions Prevented</div>
+                    </div>
+                </div>
+                <canvas id="co2Chart"></canvas>
+            </div>
+
+            <div class="impact-card">
+                <div class="impact-card-header">
+                    <div class="impact-icon">
+                        <i class="fas fa-recycle"></i>
+                    </div>
+                    <div>
+                        <div class="impact-value" id="materialsRecycled">0</div>
+                        <div class="impact-label">kg Materials Recycled</div>
+                    </div>
+                </div>
+                <canvas id="materialsChart"></canvas>
+            </div>
+
+            <div class="impact-card environmental-impact-card">
+                <div class="impact-card-header">
+                    <div class="impact-icon">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <div>
+                        <div class="impact-value">Environmental Impact</div>
+                        <div class="impact-label">Your Green Footprint</div>
+                    </div>
+                </div>
+                <div class="environmental-metrics">
+                    <div class="env-metric">
+                        <i class="fas fa-tree"></i>
+                        <div class="metric-details">
+                            <span class="metric-value" id="treesPlanted">0</span>
+                            <span class="metric-label">Trees Planted</span>
+                        </div>
+                    </div>
+                    <div class="env-metric">
+                        <i class="fas fa-tint"></i>
+                        <div class="metric-details">
+                            <span class="metric-value" id="waterSaved">0</span>
+                            <span class="metric-label">Liters Water Saved</span>
+                        </div>
+                    </div>
+                    <div class="env-metric">
+                        <i class="fas fa-bolt"></i>
+                        <div class="metric-details">
+                            <span class="metric-value" id="energySaved">0</span>
+                            <span class="metric-label">kWh Energy Saved</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="impact-card impact-breakdown-card" onclick="openImpactModal()">
+                <div class="impact-card-header">
+                    <div class="impact-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <div class="impact-value">Impact Breakdown</div>
+                        <div class="impact-label">Click to view detailed analysis</div>
+                    </div>
+                </div>
+                <div class="impact-preview">
+                    <div class="mini-stat">
+                        <i class="fas fa-leaf"></i>
+                        <span id="totalImpact">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <i class="fas fa-tree"></i>
+                        <span id="treesCount">0</span>
+                    </div>
+                    <div class="mini-stat">
+                        <i class="fas fa-utensils"></i>
+                        <span id="mealsCount">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h2 class="chart-title">Monthly Impact Overview</h2>
+            </div>
+            <canvas id="monthlyImpactChart"></canvas>
+        </div>
+
+        <div class="achievement-grid">
+            <div class="achievement-card">
+                <div class="achievement-icon">
+                    <i class="fas fa-award"></i>
+                </div>
+                <h3 class="achievement-title">Green Pioneer</h3>
+                <p class="achievement-description">Donated 5+ devices</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 60%"></div>
+                </div>
+            </div>
+
+            <div class="achievement-card">
+                <div class="achievement-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3 class="achievement-title">Earth Guardian</h3>
+                <p class="achievement-description">Prevented 100kg CO₂ emissions</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%"></div>
+                </div>
+            </div>
+
+            <div class="achievement-card">
+                <div class="achievement-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <h3 class="achievement-title">Recycling Champion</h3>
+                <p class="achievement-description">Recycled 50kg of materials</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 40%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this modal HTML at the end of body -->
+    <div id="impactModal" class="impact-modal">
+        <div class="impact-modal-content">
+            <div class="impact-modal-header">
+                <h2><i class="fas fa-chart-line"></i> Detailed Impact Analysis</h2>
+                <span class="close-impact-modal">&times;</span>
+            </div>
+            
+            <div class="impact-stats-grid">
+                <div class="impact-stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>Environmental Impact</h3>
+                        <div class="stat-value" id="modalCo2Saved">0 kg</div>
+                        <div class="stat-label">CO₂ Emissions Prevented</div>
+                    </div>
+                    <div class="stat-progress">
+                        <div class="progress-ring">
+                            <svg width="60" height="60">
+                                <circle class="progress-ring-circle" cx="30" cy="30" r="25"/>
+                            </svg>
+                            <span class="progress-text">75%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="impact-stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-recycle"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>Recycling Impact</h3>
+                        <div class="stat-value" id="modalMaterialsRecycled">0 kg</div>
+                        <div class="stat-label">Materials Recycled</div>
+                    </div>
+                    <div class="stat-progress">
+                        <div class="progress-ring">
+                            <svg width="60" height="60">
+                                <circle class="progress-ring-circle" cx="30" cy="30" r="25"/>
+                            </svg>
+                            <span class="progress-text">60%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="impact-stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3>Tree Impact</h3>
+                        <div class="stat-value" id="modalTreesPlanted">0</div>
+                        <div class="stat-label">Trees Planted</div>
+                    </div>
+                    <div class="stat-progress">
+                        <div class="progress-ring">
+                            <svg width="60" height="60">
+                                <circle class="progress-ring-circle" cx="30" cy="30" r="25"/>
+                            </svg>
+                            <span class="progress-text">45%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="impact-timeline">
+                <h3>Impact Timeline</h3>
+                <div class="timeline">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+
+            <div class="impact-charts-container">
+                <div class="chart-wrapper">
+                    <h3>Monthly Progress</h3>
+                    <canvas id="impactTrendChart"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h3>Impact Distribution</h3>
+                    <canvas id="impactDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBc83nPlTffsucRptklXYVQf0xtxiLhFa4",
+            authDomain: "impactx-42f81.firebaseapp.com",
+            projectId: "impactx-42f81",
+            storageBucket: "impactx-42f81.firebasestorage.app",
+            messagingSenderId: "498385011197",
+            appId: "1:498385011197:web:c95a0f77a2a984adc4d994",
+            measurementId: "G-3YH0R3EMY4"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Initialize charts
+        function initializeCharts(userData) {
+            // CO2 Chart
+            new Chart(document.getElementById('co2Chart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'CO₂ Saved (kg)',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderColor: '#4CAF50',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Materials Chart
+            new Chart(document.getElementById('materialsChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Metals', 'Plastics', 'Glass', 'Others'],
+                    datasets: [{
+                        data: [15, 12, 6, 3],
+                        backgroundColor: ['#4CAF50', '#81C784', '#A5D6A7', '#C8E6C9']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Monthly Impact Chart
+            new Chart(document.getElementById('monthlyImpactChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Devices Donated',
+                        data: [5, 7, 3, 8, 4, 6],
+                        borderColor: '#4CAF50',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update impact metrics
+        async function updateImpactMetrics(userData) {
+            try {
+                const totalDonations = userData.totalDonations || 0;
+                const co2PerDevice = 2.5; // kg CO2 per device
+                const materialsPerDevice = 1.2; // kg materials per device
+                
+                // Calculate impacts
+                const co2Saved = (totalDonations * co2PerDevice).toFixed(1);
+                const materialsRecycled = (totalDonations * materialsPerDevice).toFixed(1);
+                const treesPlanted = Math.floor(totalDonations / 2); // 1 tree per 2 devices
+                const waterSaved = (totalDonations * 100).toFixed(0); // 100L per device
+                const energySaved = (totalDonations * 5).toFixed(1); // 5kWh per device
+                const mealsProvided = userData.impact?.meals || 0;
+                const oceanImpact = userData.impact?.ocean || 0;
+
+                // Update main metrics
+                document.getElementById('co2Saved').textContent = co2Saved;
+                document.getElementById('materialsRecycled').textContent = materialsRecycled;
+                document.getElementById('treesPlanted').textContent = treesPlanted;
+                document.getElementById('waterSaved').textContent = waterSaved;
+                document.getElementById('energySaved').textContent = energySaved;
+
+                // Update impact breakdown preview
+                document.getElementById('totalImpact').textContent = co2Saved;
+                document.getElementById('treesCount').textContent = treesPlanted;
+                document.getElementById('mealsCount').textContent = mealsProvided;
+
+                // Update modal values if they exist
+                if (document.getElementById('modalCo2Saved')) {
+                    document.getElementById('modalCo2Saved').textContent = `${co2Saved} kg`;
+                    document.getElementById('modalMaterialsRecycled').textContent = `${materialsRecycled} kg`;
+                    document.getElementById('modalTreesPlanted').textContent = treesPlanted;
+                }
+
+                // Calculate and update progress percentages
+                const maxTrees = 100; // Example maximum values
+                const maxMeals = 1000;
+                const maxOcean = 500;
+
+                const treesProgress = (treesPlanted / maxTrees) * 100;
+                const mealsProgress = (mealsProvided / maxMeals) * 100;
+                const oceanProgress = (oceanImpact / maxOcean) * 100;
+
+                // Update progress bars if they exist
+                const progressElements = {
+                    'treesProgress': treesProgress,
+                    'mealsProgress': mealsProgress,
+                    'oceanProgress': oceanProgress
+                };
+
+                Object.entries(progressElements).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.style.width = `${Math.min(value, 100)}%`;
+                    }
+                });
+
+                console.log('Impact metrics updated:', {
+                    co2Saved,
+                    materialsRecycled,
+                    treesPlanted,
+                    mealsProvided,
+                    oceanImpact
+                });
+
+            } catch (error) {
+                console.error("Error updating impact metrics:", error);
+            }
+        }
+
+        // Check authentication state
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    console.log("Fetched user data:", userData); // Debug log
+                    document.getElementById('userName').textContent = userData.fullName || 'User';
+                    
+                    // Initialize charts with actual data
+                    initializeCharts(userData);
+                    
+                    // Update all impact metrics
+                    await updateImpactMetrics(userData);
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = 'auth.html';
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        });
+
+        function openImpactModal() {
+            document.getElementById('impactModal').style.display = 'block';
+            updateImpactCharts();
+        }
+
+        function closeImpactModal() {
+            document.getElementById('impactModal').style.display = 'none';
+        }
+
+        function updateImpactCharts() {
+            // Update trend chart
+            new Chart(document.getElementById('impactTrendChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Environmental Impact',
+                        data: [30, 45, 60, 75, 90, 100],
+                        borderColor: '#4CAF50',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+
+            // Update distribution chart
+            new Chart(document.getElementById('impactDistributionChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['CO₂ Reduction', 'Materials Recycled', 'Trees Planted'],
+                    datasets: [{
+                        data: [45, 35, 20],
+                        backgroundColor: ['#4CAF50', '#81C784', '#A5D6A7']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Add event listeners
+        document.querySelector('.close-impact-modal').addEventListener('click', closeImpactModal);
+    </script>
+</body>
+</html> 

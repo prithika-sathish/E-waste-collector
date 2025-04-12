@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Waste Management Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #2d5a27;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            transition: 0.3s;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-menu {
+            margin-top: 30px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .welcome-message {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-card h3 i {
+            margin-right: 10px;
+            color: #2d5a27;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            color: #2d5a27;
+            margin: 10px 0;
+        }
+
+        .user-details {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            flex: 1;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            flex: 2;
+            color: #2c3e50;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .logout-btn i {
+            margin-right: 10px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                padding: 10px;
+            }
+
+            .sidebar-header span,
+            .nav-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+
+        .metric:nth-child(2) .value {
+            color: #4CAF50; /* Green color for points */
+            font-weight: bold;
+        }
+
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .metric:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric .value {
+            font-size: 2.5em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .metric .label {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .redeem-card {
+            text-align: center;
+        }
+
+        .points-available {
+            font-size: 1.5em;
+            margin: 15px 0;
+            color: #4CAF50;
+        }
+
+        .redeem-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .redeem-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 15px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: -30px;
+            background: white;
+            z-index: 1;
+            margin: -30px -30px 20px -30px;
+            padding: 20px 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .close {
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .points-balance {
+            position: sticky;
+            top: 70px;
+            background: white;
+            z-index: 1;
+            padding: 15px 0;
+            margin: -15px 0 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .redemption-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 15px 0;
+        }
+
+        .redemption-option {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .redemption-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .redemption-option i {
+            font-size: 2em;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .redemption-option input {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .redeem-option-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .impact-breakdown {
+            padding: 20px;
+        }
+
+        .impact-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .impact-item:last-child {
+            border-bottom: none;
+        }
+
+        .impact-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .impact-value {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .redemption-option .impact-note {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+            margin: 5px 0 15px 0;
+        }
+
+        .redemption-option p {
+            margin: 5px 0;
+        }
+
+        .redemption-option h3 {
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .redemption-option input {
+            position: relative;
+        }
+
+        .redemption-option input:focus + .max-points {
+            display: block;
+        }
+
+        .max-points {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        /* Scrollbar Styling */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #2d5a27;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #234a1f;
+        }
+        .sidenav {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            z-index: 1001;
+            top: 0;
+            left: 0;
+            background: rgba(45, 90, 39, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding-top: 20px;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            transition: 0.3s ease;
+        }
+
+        .sidenav-header {
+            padding: 0 20px 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidenav-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .sidenav-header h2 {
+            color: white;
+            font-size: 1.5em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: #4CAF50;
+        }
+
+        .nav-item i {
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+        .user-profile {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .user-role {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+        .leaderboard-btn {
+            background: linear-gradient(135deg, #2d5a27 0%, #1a4314 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 90, 39, 0.2);
+        }
+
+        .leaderboard-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(45, 90, 39, 0.3);
+        }
+
+        .leaderboard-btn i {
+            font-size: 1.2em;
+            color: #ffd700;
+        }
+
+        .leaderboard-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            animation: modalFadeIn 0.3s ease;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .leaderboard-content {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            margin: 3% auto;
+            padding: 35px;
+            width: 95%;
+            max-width: 1200px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.4s ease;
+            margin-left:18%;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(45, 90, 39, 0.1);
+        }
+
+        .leaderboard-header h2 {
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-header h2 i {
+            color: #ffd700;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .close-leaderboard {
+            font-size: 32px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-leaderboard:hover {
+            background: rgba(0,0,0,0.1);
+            transform: rotate(90deg);
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 5px;
+            background: rgba(45, 90, 39, 0.1);
+            border-radius: 15px;
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tab-btn.active {
+            background: #2d5a27;
+            color: white;
+            box-shadow: 0 4px 15px rgba(45, 90, 39, 0.2);
+        }
+
+        .leaderboard-category {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .leaderboard-category:hover {
+            transform: translateY(-5px);
+        }
+
+        .leaderboard-category h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .leaderboard-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .rank {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .rank::after {
+            content: '';
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid;
+            border-color: inherit;
+            opacity: 0.3;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            70% { transform: scale(1.1); opacity: 0.2; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+
+        .rank.top-1 { 
+            background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+            color: white;
+            border-color: #ffd700;
+        }
+
+        .rank.top-2 { 
+            background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
+            color: white;
+            border-color: #c0c0c0;
+        }
+
+        .rank.top-3 { 
+            background: linear-gradient(135deg, #cd7f32 0%, #a05a20 100%);
+            color: white;
+            border-color: #cd7f32;
+        }
+
+        .user-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .user-score {
+            color: #2d5a27;
+            font-weight: bold;
+            margin-left: auto;
+            font-size: 1.2em;
+            background: rgba(45, 90, 39, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-score i {
+            color: #ffd700;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidenav" id="sidenav">
+        <div class="sidenav-header">
+            <h2>
+                <i class="fas fa-recycle"></i>
+                E-Collector
+            </h2>
+        </div>
+
+        <div class="user-profile">
+            <img src="https://ui-avatars.com/api/?name=User&background=random" alt="User">
+            <div class="user-info">
+                <div class="user-name" id="userName">Loading...</div>
+                <div class="user-role" id="userRole">User</div>
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-camera"></i>
+                <span>Scan Device</span>
+            </a>
+            <a href="scan-history.html" class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>Scan History</span>
+            </a>
+            <a href="rewards.html" class="nav-item">
+                <i class="fas fa-gift"></i>
+                <span>Rewards</span>
+            </a>
+            <a href="collection-points.html" class="nav-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Collection Points</span>
+            </a>
+            <a href="impact-report.html" class="nav-item">
+                <i class="fas fa-leaf"></i>
+                <span>Impact Report</span>
+            </a>
+            <button class="logout-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </nav>
+
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <div class="welcome-message">Welcome back, <span id="welcomeName">User</span>!</div>
+            <p>Track your e-waste contribution and environmental impact</p>
+        </div>
+
+        <div class="metrics-container">
+            <div class="metric">
+                <div class="value">0</div>
+                <div class="label">Devices Donated</div>
+            </div>
+            <div class="metric">
+                <div class="value">0</div>
+                <div class="label">Points Collected</div>
+            </div>
+            <div class="metric">
+                <div class="value">0.0</div>
+                <div class="label">Environmental Impact (kg CO₂)</div>
+            </div>
+        </div>
+
+        <div class="user-stats">
+            <div class="stat-card redeem-card">
+                <h3><i class="fas fa-gift"></i>Redeem Points</h3>
+                <div class="points-available">
+                    <span id="availablePoints">0</span> points available
+                </div>
+                <button class="redeem-btn" onclick="openRedeemModal()">
+                    <i class="fas fa-exchange-alt"></i> Redeem Points
+                </button>
+            </div>
+            <div class="stat-card impact-breakdown">
+                <h3><i class="fas fa-chart-pie"></i>Impact Breakdown</h3>
+                <div id="impactBreakdown">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+        <button id="leaderboardBtn" class="leaderboard-btn">
+            <i class="fas fa-trophy"></i>
+            View Leaderboard
+        </button>
+
+        <div class="user-details">
+            <h2>Personal Information</h2>
+            <div class="detail-row">
+                <div class="detail-label">Full Name</div>
+                <div class="detail-value" id="userFullName">Loading...</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Email</div>
+                <div class="detail-value" id="userEmail">Loading...</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Phone</div>
+                <div class="detail-value" id="userPhone">Loading...</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Address</div>
+                <div class="detail-value" id="userAddress">Loading...</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Donor Type</div>
+                <div class="detail-value" id="userDonorType">Loading...</div>
+            </div>
+        </div>
+
+        <div>
+            <h2>Your Points</h2>
+            <p id="userPoints">0</p>
+        </div>
+    </div>
+
+    <!-- Add Modal for Points Redemption -->
+    <div id="redeemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Redeem Your Points</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="points-balance">
+                    Available Points: <span id="modalPoints">0</span>
+                </div>
+                <div class="redemption-options">
+                    <div class="redemption-option" data-points="10" data-impact="1" data-type="trees">
+                        <i class="fas fa-tree"></i>
+                        <h3>Plant Trees</h3>
+                        <p>10 points = 1 tree planted</p>
+                        <p class="impact-note">Each tree absorbs ~22kg of CO₂ per year</p>
+                        <input type="number" min="0" step="1" placeholder="Number of trees">
+                        <button class="redeem-option-btn">Redeem</button>
+                    </div>
+                    <div class="redemption-option" data-points="5" data-impact="1" data-type="meals">
+                        <i class="fas fa-utensils"></i>
+                        <h3>Feed the Hungry</h3>
+                        <p>5 points = 1 meal provided</p>
+                        <p class="impact-note">Help fight hunger in your community</p>
+                        <input type="number" min="0" step="1" placeholder="Number of meals">
+                        <button class="redeem-option-btn">Redeem</button>
+                    </div>
+                    <div class="redemption-option" data-points="20" data-impact="1" data-type="ocean">
+                        <i class="fas fa-water"></i>
+                        <h3>Clean Oceans</h3>
+                        <p>20 points = 1kg plastic removed</p>
+                        <p class="impact-note">Help marine life thrive</p>
+                        <input type="number" min="0" step="1" placeholder="Kilograms of plastic">
+                        <button class="redeem-option-btn">Redeem</button>
+                    </div>
+                    <div class="redemption-option" data-points="15" data-impact="1" data-type="education">
+                        <i class="fas fa-book"></i>
+                        <h3>Support Education</h3>
+                        <p>15 points = 1 book donated</p>
+                        <p class="impact-note">Empower through knowledge</p>
+                        <input type="number" min="0" step="1" placeholder="Number of books">
+                        <button class="redeem-option-btn">Redeem</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add this modal HTML at the end of the body, before scripts -->
+    <div id="leaderboardModal" class="leaderboard-modal">
+        <div class="leaderboard-content">
+            <div class="leaderboard-header">
+                <h2><i class="fas fa-trophy"></i> Impact Leaderboard</h2>
+                <span class="close-leaderboard">&times;</span>
+            </div>
+            <center>
+            
+            <div class="leaderboard-tabs">
+                <button class="tab-btn active" data-period="weekly">Weekly</button>
+                <button class="tab-btn" data-period="monthly">Monthly</button>
+            </div>
+    </center>
+            <div class="leaderboard-section" id="weeklyLeaderboard">
+                <div class="leaderboard-category">
+                    <h3><i class="fas fa-star"></i> Top Points</h3>
+                    <div class="leaderboard-list" id="weeklyPointsList">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+                
+                <div class="leaderboard-category">
+                    <h3><i class="fas fa-recycle"></i> Most Donations</h3>
+                    <div class="leaderboard-list" id="weeklyDonationsList">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="leaderboard-section" id="monthlyLeaderboard" style="display: none;">
+                <div class="leaderboard-category">
+                    <h3><i class="fas fa-star"></i> Top Points</h3>
+                    <div class="leaderboard-list" id="monthlyPointsList">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+                
+                <div class="leaderboard-category">
+                    <h3><i class="fas fa-recycle"></i> Most Donations</h3>
+                    <div class="leaderboard-list" id="monthlyDonationsList">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBc83nPlTffsucRptklXYVQf0xtxiLhFa4",
+            authDomain: "impactx-42f81.firebaseapp.com",
+            projectId: "impactx-42f81",
+            storageBucket: "impactx-42f81.firebasestorage.app",
+            messagingSenderId: "498385011197",
+            appId: "1:498385011197:web:c95a0f77a2a984adc4d994",
+            measurementId: "G-3YH0R3EMY4"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Check authentication state
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            try {
+                // Get user data directly from users collection
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    console.error('User document not found');
+                    auth.signOut();
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                const userData = userDoc.data();
+                
+                // Check if user is trying to access wrong dashboard
+                if (userData.role === 'technician' || user.email === 'tech@gmail.com') {
+                    window.location.href = 'technician-dashboard.html';
+                    return;
+                }
+                
+                // Update basic user info
+                document.getElementById('userName').textContent = userData.fullName || 'User';
+                document.getElementById('welcomeName').textContent = userData.fullName || 'User';
+                document.getElementById('userFullName').textContent = userData.fullName || '-';
+                document.getElementById('userEmail').textContent = userData.email || '-';
+                
+                // Format donor type for display
+                let displayDonorType;
+                switch (userData.donorType) {
+                    case 'individual':
+                        displayDonorType = 'Individual Donor';
+                        break;
+                    case 'business':
+                        displayDonorType = 'Business Partner';
+                        break;
+                    case 'ngo':
+                        displayDonorType = 'NGO Representative';
+                        break;
+                    default:
+                        displayDonorType = userData.donorType || '-';
+                }
+                document.getElementById('userDonorType').textContent = displayDonorType;
+
+                // Update metrics
+                await updateDashboardMetrics(userData);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                showError("Failed to load user data. Please refresh the page.");
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                window.location.href = 'auth.html';
+            } catch (error) {
+                console.error("Error signing out:", error);
+            }
+        });
+
+        // Add this after Firebase initialization
+        async function updateDashboardMetrics(userData) {
+            if (!userData) return;
+
+            try {
+                // Get values from userData
+                const donationsCount = userData.totalDonations || 0;
+                const points = userData.points || 0;
+                const impact = userData.impact || {
+                    trees: 0,
+                    meals: 0,
+                    ocean: 0,
+                    education: 0
+                };
+
+                // Get environmental impact directly from userData
+                const totalEnvironmentalImpact = (userData.environmentalImpact || 0).toFixed(1);
+
+                // Update all points displays at once
+                const pointsDisplays = [
+                    document.querySelector('.metric:nth-child(1) .value'),
+                    document.querySelector('.metric:nth-child(2) .value'),
+                    document.querySelector('.metric:nth-child(3) .value'),
+                    document.getElementById('availablePoints'),
+                    document.getElementById('modalPoints'),
+                    document.getElementById('userPoints')
+                ];
+
+                // Update metrics
+                pointsDisplays[0].textContent = donationsCount;
+                pointsDisplays[1].textContent = points;
+                pointsDisplays[2].textContent = totalEnvironmentalImpact;
+                pointsDisplays[3].textContent = points;
+                pointsDisplays[4].textContent = points;
+                pointsDisplays[5].textContent = points;
+
+                // Update impact breakdown
+                const impactBreakdown = document.getElementById('impactBreakdown');
+                if (impactBreakdown) {
+                    impactBreakdown.innerHTML = `
+                        <div class="impact-item">
+                            <div class="impact-label">
+                                <i class="fas fa-tree"></i>
+                                Trees Planted
+                            </div>
+                            <div class="impact-value">${impact.trees || 0}</div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-label">
+                                <i class="fas fa-utensils"></i>
+                                Meals Provided
+                            </div>
+                            <div class="impact-value">${impact.meals || 0}</div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-label">
+                                <i class="fas fa-water"></i>
+                                Ocean Plastic Removed (kg)
+                            </div>
+                            <div class="impact-value">${impact.ocean || 0}</div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-label">
+                                <i class="fas fa-book"></i>
+                                Books Donated
+                            </div>
+                            <div class="impact-value">${impact.education || 0}</div>
+                        </div>
+                    `;
+                }
+
+                // Update max redemptions
+                updateMaxRedemptions(points);
+            } catch (error) {
+                console.error("Error updating metrics:", error);
+            }
+        }
+
+        // Remove the duplicate fetchUserPoints call
+        document.addEventListener('DOMContentLoaded', () => {
+            // The auth.onAuthStateChanged above will handle the initial load
+        });
+
+        // Modal functions
+        function openRedeemModal() {
+            document.getElementById('redeemModal').style.display = 'block';
+        }
+
+        function closeRedeemModal() {
+            document.getElementById('redeemModal').style.display = 'none';
+        }
+
+        // Add redemption functionality
+        async function redeemPoints(type, points, impact) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            try {
+                const userRef = db.collection('users').doc(user.uid);
+                const userDoc = await userRef.get();
+                const userData = userDoc.data();
+                const currentPoints = userData.points || 0;
+
+                if (currentPoints < points) {
+                    alert('Not enough points!');
+                    return;
+                }
+
+                // Calculate environmental impact based on redemption type
+                let environmentalImpact = 0;
+                let impactMessage = '';
+                switch(type) {
+                    case 'trees':
+                        environmentalImpact = impact * 22;
+                        impactMessage = `${impact} tree${impact > 1 ? 's' : ''} planted`;
+                        break;
+                    case 'ocean':
+                        environmentalImpact = impact * 2.5;
+                        impactMessage = `${impact}kg of ocean plastic removed`;
+                        break;
+                    case 'meals':
+                        environmentalImpact = impact * 1;
+                        impactMessage = `${impact} meal${impact > 1 ? 's' : ''} provided`;
+                        break;
+                    case 'education':
+                        environmentalImpact = impact * 0.5;
+                        impactMessage = `${impact} book${impact > 1 ? 's' : ''} donated`;
+                        break;
+                }
+
+                // Calculate environmental impact for this redemption
+                let envImpactChange = 0;
+                if (type === 'social') {
+                    // Social causes (meals, education) don't affect environmental impact
+                    envImpactChange = 0;
+                } else {
+                    // Environmental causes increase impact
+                    switch(type) {
+                        case 'trees':
+                            envImpactChange = impact * 22; // 22kg CO2 per tree
+                            break;
+                        case 'ocean':
+                            envImpactChange = impact * 2.5; // 2.5kg CO2 per kg plastic
+                            break;
+                    }
+                }
+
+                // Update points, impact, and environmental impact
+                await userRef.update({
+                    points: firebase.firestore.FieldValue.increment(-points),
+                    [`impact.${type}`]: firebase.firestore.FieldValue.increment(impact),
+                    environmentalImpact: firebase.firestore.FieldValue.increment(envImpactChange),
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Fetch updated user data and refresh display
+                const updatedDoc = await userRef.get();
+                await updateDashboardMetrics(updatedDoc.data());
+                alert(`Redemption successful! ${impactMessage}`);
+            } catch (error) {
+                console.error("Error redeeming points:", error);
+                alert('Error redeeming points. Please try again.');
+            }
+        }
+
+        // Event listeners
+        document.querySelector('.close').addEventListener('click', closeRedeemModal);
+
+        document.querySelectorAll('.redemption-option').forEach(option => {
+            const input = option.querySelector('input');
+            const button = option.querySelector('button');
+            const pointsPerUnit = parseInt(option.dataset.points);
+            const impactPerUnit = parseInt(option.dataset.impact);
+            const type = option.dataset.type;
+
+            button.addEventListener('click', () => {
+                const units = parseInt(input.value);
+                if (units > 0) {
+                    redeemPoints(type, units * pointsPerUnit, units * impactPerUnit);
+                }
+            });
+        });
+
+        function updateMaxRedemptions(availablePoints) {
+            document.querySelectorAll('.redemption-option').forEach(option => {
+                const pointsPerUnit = parseInt(option.dataset.points);
+                const input = option.querySelector('input');
+                const maxUnits = Math.floor(availablePoints / pointsPerUnit);
+                
+                input.setAttribute('max', maxUnits);
+                input.setAttribute('placeholder', `Number of units (max: ${maxUnits})`);
+            });
+        }
+
+        document.querySelectorAll('.redemption-option input').forEach(input => {
+            input.addEventListener('input', function() {
+                const option = this.closest('.redemption-option');
+                const pointsPerUnit = parseInt(option.dataset.points);
+                const units = parseInt(this.value);
+                const availablePoints = parseInt(document.getElementById('modalPoints').textContent);
+                
+                if (units * pointsPerUnit > availablePoints) {
+                    this.value = Math.floor(availablePoints / pointsPerUnit);
+                    alert('Adjusted to maximum possible units based on your available points');
+                }
+            });
+        });
+        function openLeaderboard() {
+            document.getElementById('leaderboardModal').style.display = 'block';
+            updateLeaderboard('weekly');
+        }
+
+        function closeLeaderboard() {
+            document.getElementById('leaderboardModal').style.display = 'none';
+        }
+
+        async function updateLeaderboard(period) {
+            try {
+                // Get all users
+                const usersSnapshot = await db.collection('users').get();
+                const users = [];
+                
+                usersSnapshot.forEach(doc => {
+                    const userData = doc.data();
+                    users.push({
+                        name: userData.fullName || 'Anonymous',
+                        points: userData.points || 0,
+                        donations: userData.totalDonations || 0
+                    });
+                });
+
+                // Sort users by points and donations
+                const pointsLeaders = [...users].sort((a, b) => b.points - a.points).slice(0, 10);
+                const donationLeaders = [...users].sort((a, b) => b.donations - a.donations).slice(0, 10);
+
+                // Update the lists
+                const pointsList = document.getElementById(`${period}PointsList`);
+                const donationsList = document.getElementById(`${period}DonationsList`);
+                function getAchievementTitle(points) {
+                    if (points >= 5000) return 'Legendary Recycler';
+                    if (points >= 3000) return 'Master Environmentalist';
+                    if (points >= 1000) return 'Green Warrior';
+                    if (points >= 500) return 'Eco Champion';
+                    return 'Green Pioneer';
+                }
+                function getDonationTitle(donations) {
+                    if (donations >= 50) return 'Elite Donor';
+                    if (donations >= 30) return 'Premium Contributor';
+                    if (donations >= 20) return 'Active Donor';
+                    if (donations >= 10) return 'Regular Donor';
+                    return 'Eco Supporter';
+                }
+
+                pointsList.innerHTML = pointsLeaders.map((user, index) => `
+                    <div class="leaderboard-item">
+                        <div class="rank ${index < 3 ? 'top-' + (index + 1) : ''}">${index + 1}</div>
+                        <div class="user-info">
+                            <div class="user-name">${user.name}</div>
+                            <div class="user-subtitle">${getAchievementTitle(user.points)}</div>
+                        </div>
+                        <div class="user-score">
+                            <i class="fas fa-star"></i>
+                            ${user.points.toLocaleString()} points
+                        </div>
+                    </div>
+                `).join('');
+
+                donationsList.innerHTML = donationLeaders.map((user, index) => `
+                    <div class="leaderboard-item">
+                        <div class="rank ${index < 3 ? 'top-' + (index + 1) : ''}">${index + 1}</div>
+                        <div class="user-info">
+                            <div class="user-name">${user.name}</div>
+                            <div class="user-subtitle">${getDonationTitle(user.donations)}</div>
+                        </div>
+                        <div class="user-score">
+                            <i class="fas fa-recycle"></i>
+                            ${user.donations.toLocaleString()} donations
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error("Error updating leaderboard:", error);
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('leaderboardBtn').addEventListener('click', openLeaderboard);
+        document.querySelector('.close-leaderboard').addEventListener('click', closeLeaderboard);
+
+        // Error handling function
+        function showError(message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html> 

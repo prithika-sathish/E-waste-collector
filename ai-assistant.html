@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <script src="https://unpkg.com/three@0.139.2/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.139.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.139.2/examples/js/loaders/GLTFLoader.js"></script>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: Arial, sans-serif;
+        }
+        
+        #canvas-container { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .chat-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .chat-box {
+            display: flex;
+            width: 100%;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        #userInput {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        #talkButton {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        #talkButton:hover {
+            background: #3d8b40;
+        }
+        
+        .response-box {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            min-width: 300px;
+            max-width: 600px;
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        .response-text {
+            margin: 0;
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 30px;
+            border-radius: 30px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div class="loading" id="loadingText">Loading AI Assistant...</div>
+    
+    <div class="chat-container">
+        <div class="chat-box">
+            <input type="text" id="userInput" placeholder="Ask me about e-waste management..." />
+            <button id="talkButton">Talk</button>
+        </div>
+    </div>
+    
+    <div class="response-box" id="responseBox">
+        <p class="response-text" id="responseText"></p>
+    </div>
+
+    <script>
+        // Initialize Three.js scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Lighting setup
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        
+        // Main key light (warm, front-right)
+        const mainLight = new THREE.DirectionalLight(0xffd1b3, 2.5);
+        mainLight.position.set(5, 5, 2);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+        
+        // Fill light (cool, front-left)
+        const fillLight = new THREE.DirectionalLight(0xb3d1ff, 1.5);
+        fillLight.position.set(-5, 2, 2);
+        scene.add(fillLight);
+        
+        // Back light for rim highlighting
+        const backLight = new THREE.DirectionalLight(0xffffff, 1);
+        backLight.position.set(0, 3, -5);
+        scene.add(backLight);
+
+        // Enable shadows
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        
+        // Camera positioning for better view
+        camera.position.z = 2.2;
+        camera.position.y = 1.6;
+        camera.position.x = 0.3;
+
+        // Orbit controls setup
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 1.8;
+        controls.minPolarAngle = Math.PI / 2.5;
+        controls.maxAzimuthAngle = Math.PI / 4;
+        controls.minAzimuthAngle = -Math.PI / 4;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        controls.rotateSpeed = 0.5;
+        controls.target.set(0, 1.5, 0);
+        controls.update();
+
+        // Animation variables
+        let mixer;
+        let avatar;
+        let avatarAnimation;
+        let isTalking = false;
+        let jawBone;
+        let leftHandBone;
+        let rightHandBone;
+
+        // Show loading text
+        document.getElementById('loadingText').style.display = 'block';
+
+        // Load avatar model
+        const loader = new THREE.GLTFLoader();
+        loader.load('avatar.glb', 
+            // Success callback
+            function(gltf) {
+                document.getElementById('loadingText').style.display = 'none';
+                
+                avatar = gltf.scene;
+                scene.add(avatar);
+                
+                // Center and scale the model
+                const box = new THREE.Box3().setFromObject(avatar);
+                const center = box.getCenter(new THREE.Vector3());
+                avatar.position.x = -center.x;
+                avatar.position.y = -center.y;
+                avatar.position.z = -center.z;
+                
+                // Adjust material properties for better 3D look
+                avatar.traverse((object) => {
+                    if (object.isMesh) {
+                        object.castShadow = true;
+                        object.receiveShadow = true;
+                        
+                        if (object.material) {
+                            object.material.roughness = 0.7;
+                            object.material.metalness = 0.3;
+                            object.material.needsUpdate = true;
+                        }
+                    }
+                    if (object.isBone) {
+                        const name = object.name.toLowerCase();
+                        if (name.includes('jaw') || name.includes('mouth')) {
+                            jawBone = object;
+                        } else if (name.includes('hand') || name.includes('palm') || name.includes('wrist')) {
+                            if (name.includes('left')) {
+                                leftHandBone = object;
+                            } else if (name.includes('right')) {
+                                rightHandBone = object;
+                            }
+                        }
+                    }
+                });
+                
+                // Set up animation mixer
+                mixer = new THREE.AnimationMixer(avatar);
+                
+                // Log available animations
+                console.log('Available animations:', gltf.animations.length);
+                if (gltf.animations.length > 0) {
+                    avatarAnimation = mixer.clipAction(gltf.animations[0]);
+                    avatarAnimation.play();
+                }
+            },
+            // Progress callback
+            function(xhr) {
+                const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
+                document.getElementById('loadingText').textContent = 
+                    `Loading AI Assistant... ${percent}%`;
+            },
+            // Error callback
+            function(error) {
+                console.error('Error loading model:', error);
+                document.getElementById('loadingText').textContent = 
+                    'Error loading AI Assistant';
+            }
+        );
+
+        // Sample responses
+        const responses = [
+            "I'm here to help you with e-waste management. What would you like to know?",
+            "Electronic waste contains valuable resources that can be recycled. This helps reduce environmental impact.",
+            "Recycling e-waste helps reduce environmental pollution and conserves natural resources.",
+            "You can earn points by recycling your electronic devices through our program.",
+            "With 3000 points, you become a Master Environmentalist in our rewards program!",
+            "Did you know that only about 20% of e-waste is properly recycled globally? We're working to change that.",
+            "Smartphones contain gold, silver, copper, and other valuable materials that can be recovered.",
+            "One metric ton of circuit boards can contain 40-800 times the amount of gold in ore.",
+            "E-waste is the fastest growing waste stream globally. Let's work together to manage it properly.",
+            "Thank you for being environmentally conscious! Every device recycled makes a difference."
+        ];
+
+        // Talk function
+        function talk() {
+            if (isTalking) return;
+            
+            const query = document.getElementById('userInput').value.trim();
+            if (!query) return;
+            
+            isTalking = true;
+            const responseBox = document.getElementById('responseBox');
+            const responseText = document.getElementById('responseText');
+            
+            // Show response
+            const response = responses[Math.floor(Math.random() * responses.length)];
+            responseBox.style.display = 'block';
+            responseText.textContent = response;
+            
+            // Animate avatar
+            if (avatarAnimation) {
+                avatarAnimation.reset();
+                avatarAnimation.play();
+            }
+            
+            // Text to speech with synchronized jaw and hand movements
+            const utterance = new SpeechSynthesisUtterance(response);
+            utterance.rate = 1.0;
+            utterance.pitch = 1.1;
+            utterance.volume = 1.0;
+            
+            // Start jaw and hand animation
+            let startTime = Date.now();
+            let jawInterval = setInterval(() => {
+                if (jawBone) {
+                    // More pronounced jaw movement
+                    const speed = 0.02; // Adjusted speed
+                    const baseAngle = 0.1; // Base opening
+                    const talkAngle = Math.sin((Date.now() - startTime) * speed) * 0.15;
+                    jawBone.rotation.x = baseAngle + Math.max(0, talkAngle); // Prevent negative angles
+                }
+            }, 16);
+
+            let handInterval = setInterval(() => {
+                if (leftHandBone && rightHandBone) {
+                    // More natural hand gestures
+                    const time = (Date.now() - startTime) * 0.001;
+                    
+                    // Subtle hand rotations
+                    leftHandBone.rotation.z = Math.sin(time * 1.5) * 0.15;
+                    rightHandBone.rotation.z = Math.sin(time * 1.5 + Math.PI) * 0.15;
+                    
+                    // Gentle forward/backward movement
+                    leftHandBone.rotation.x = Math.sin(time * 0.8) * 0.1;
+                    rightHandBone.rotation.x = Math.sin(time * 0.8 + Math.PI) * 0.1;
+                    
+                    // Slight side-to-side movement
+                    leftHandBone.rotation.y = Math.cos(time * 0.5) * 0.2;
+                    rightHandBone.rotation.y = Math.cos(time * 0.5 + Math.PI) * 0.2;
+                }
+            }, 16);
+            
+            utterance.onend = function() {
+                // Stop jaw and hand animations
+                clearInterval(jawInterval);
+                clearInterval(handInterval);
+                
+                // Reset bone rotations
+                if (jawBone) jawBone.rotation.x = 0;
+                if (leftHandBone) {
+                    leftHandBone.rotation.z = 0;
+                    leftHandBone.rotation.x = 0;
+                    leftHandBone.rotation.y = 0;
+                }
+                if (rightHandBone) {
+                    rightHandBone.rotation.z = 0;
+                    rightHandBone.rotation.x = 0;
+                    rightHandBone.rotation.y = 0;
+                }
+                
+                setTimeout(() => {
+                    responseBox.style.display = 'none';
+                    isTalking = false;
+                }, 1000);
+            };
+            
+            window.speechSynthesis.speak(utterance);
+            
+            // Clear input
+            document.getElementById('userInput').value = '';
+        }
+
+        // Event listeners
+        document.getElementById('talkButton').addEventListener('click', talk);
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') talk();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation loop
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (mixer) {
+                mixer.update(clock.getDelta());
+            }
+            
+            if (avatar && !isTalking) {
+                avatar.rotation.y += 0.003;
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
